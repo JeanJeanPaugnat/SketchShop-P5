@@ -1,4 +1,4 @@
-
+import { createCanvas} from './canvasPage/page.js';
 
 
 function sizeSelected(ev) {
@@ -7,7 +7,9 @@ function sizeSelected(ev) {
 }
 
 function customSizeSelected(width, height) {
+    console.log(width, height);
     console.log("Custom size selected: " + width + "x" + height);
+    createCanvas(width, height);
 }
 
 
@@ -21,7 +23,7 @@ function attachEventListeners() {
     let inputHeight = document.getElementById("custom-height");
     if (inputWidth && inputHeight) {
         applyCustom.addEventListener("click", function(ev) {
-            ev.preventDefault();
+            console.log("Custom size applied");
             let width = parseInt(inputWidth.value);
             let height = parseInt(inputHeight.value);
             customSizeSelected(width, height);

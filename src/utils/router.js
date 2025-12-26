@@ -28,6 +28,10 @@ const routes = {
       
       // Charger et exécuter le script
       const module = await import('../canvasPage/page.js');
+      
+      // Créer le canvas avec des dimensions par défaut après que le template soit chargé
+      const { createCanvas } = module;
+      createCanvas(800, 600);
     }
   },
   '/export': {

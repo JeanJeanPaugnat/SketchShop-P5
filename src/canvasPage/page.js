@@ -1,141 +1,64 @@
 import p5 from "p5";
 
-let windowSizeWidth = window.innerWidth;
-let windowSizeHeight = window.innerHeight;
-let pencilMode = false; // État du mode crayon (toggle)
 
-// Mode instance : toutes les fonctions p5 doivent être dans cette fonction
-new p5((p) => {
-  
-  p.setup = function() {
-    p.createCanvas(windowSizeWidth, windowSizeHeight);
-    p.background(220);
-    
-    // Event listener pour le bouton pencil
-    const buttonPencil = document.getElementById("pencil");
-    
-    let buttonChangeColor = document.querySelector('#colorChange');
-    buttonChangeColor.addEventListener('change', changeColor)
-    console.log(buttonPencil)
-    buttonPencil.addEventListener("click", togglePencilMode);
-    const buttonRectangle = document.getElementById("square");
-    buttonRectangle.addEventListener("click", toggleRectanggleMode);
-  }
+let pInstance = null;
+let sizeCanvasWidth = 0;
+let sizeCanvasHeight = 0;
 
-  p.draw = function() {
-    p.noStroke();
+function resizeCanvas() {
+    let inputWidth = document.querySelector("#custom-width");
+    let inputHeight = document.querySelector("#custom-height");
     
-    // Dessiner seulement si le mode crayon est actif ET que la souris est pressée
-    if (pencilMode && p.mouseIsPressed) {
-      console.log("drawing");
-      p.circle(p.mouseX, p.mouseY, 20);
+    if (!inputWidth || !inputHeight) {
+        console.error("Inputs not found");
+        return;
     }
-  }
+    
+    let width = parseInt(inputWidth.value);
+    let height = parseInt(inputHeight.value);
+    console.log("Resizing canvas to: " + width + "x" + height);
+    
+    if (pInstance && width > 0 && height > 0) {
+        pInstance.resizeCanvas(width, height);
+        pInstance.background(220);
+    }
+}
 
-  p.windowResized = function() {
-    windowSizeWidth = window.innerWidth;
-    windowSizeHeight = window.innerHeight;
-    console.log(windowSizeHeight, windowSizeWidth);
-    p.resizeCanvas(windowSizeWidth, windowSizeHeight);
-  }
+export function createCanvas(width, height) {
+  sizeCanvasWidth = width;
+  sizeCanvasHeight = height;
+  
+    let inputWidth = document.querySelector("#custom-width");
+    let inputHeight = document.querySelector("#custom-height");
+    let resizeButton = document.querySelector("#resize");
+    
+    // Vérifier que les éléments existent
+    if (!inputWidth || !inputHeight || !resizeButton) {
+        console.error("Canvas settings elements not found");
+        return;
+    }
+    
+    // Assigner les valeurs
+    inputWidth.value = width;
+    inputHeight.value = height;
+    console.log("Canvas inputs set to: " + width + "x" + height);
+    
+    // Attacher l'écouteur une seule fois
+    if (!resizeButton.dataset.listenerAttached) {
+        resizeButton.addEventListener("click", resizeCanvas);
+        resizeButton.dataset.listenerAttached = "true";
+    }
 
-  p.placeRectangle = function(x, y) {
-    p.fill(0);
-    p.rect(x, y, 10, 10);
-  }
-
-  // Exposer les variables p5 globalement si nécessaire
-  window.p5Instance = p;
-  console.log(window.p5Instance);
-});
-
-
-function toggleSquareMode() {
-  squareMode = !squareMode; // Toggle l'état
-  const buttonSquare = document.getElementById("square");
-  console.log(buttonSquare)
-  console.log(mouseX, mouseY)
-  // Optionnel : ajouter une classe CSS pour visuellement montrer l'état actif
-  if (squareMode) {
-    console.log("Square mode activated");
-    buttonSquare.classList.add("active");
+  if (!pInstance) {
+    pInstance = new p5((p) => {
+      p.setup = () => {
+        p.createCanvas(sizeCanvasWidth, sizeCanvasHeight);
+        p.background(220);
+      };
+    });
   } else {
-    console.log("Square mode deactivated");
-    buttonSquare.classList.remove("active");
+    console.log("Resizing canvas to: " + width + "x" + height);
+    pInstance.resizeCanvas(width, height);
+    pInstance.background(220);
   }
 }
-
-function togglePencilMode() {
-  pencilMode = !pencilMode; // Toggle l'état
-  const buttonPencil = document.getElementById("pencil");
-  console.log(buttonPencil)
-  console.log(mouseX, mouseY)
-  // Optionnel : ajouter une classe CSS pour visuellement montrer l'état actif
-  if (pencilMode) {
-    console.log("Pencil mode activated");
-    buttonPencil.classList.add("active");
-  } else {
-    console.log("Pencil mode deactivated");
-    buttonPencil.classList.remove("active");
-  }
-}
-
-function toggleRectanggleMode() {
-  rectangleMode = !rectangleMode; // Toggle l'état
-  const buttonRectangle = document.getElementById("square");
-  console.log(buttonRectangle)
-  console.log(mouseX, mouseY)
-  // Optionnel : ajouter une classe CSS pour visuellement montrer l'état actif
-  if (rectangleMode) {
-    console.log("Rectangle mode activated");
-    buttonRectangle.classList.add("active");
-  } else {
-    console.log("Rectangle mode deactivated");
-    buttonRectangle.classList.remove("active");
-  }
-}
-
-
-//add palette complette visuelle pour choisir la couleur en RVB 
-function changeColor(ev){
-  let colorCurent = ev.target.value;
-  console.log(colorCurent)
-  const p = window.p5Instance;
-  if (colorCurent === 'red'){
-    p.fill(255, 0, 0);
-  }else if (colorCurent === 'yellow'){
-    p.fill(150, 50, 0)
-  }else{
-    p.fill(255, 255, 255)
-  }
-}
-
-//il faut que quand j'appelle je puisse placer un rectangle ou carré à l'endroit ou je maintiens au debut en x,y et au relachement x,y
-//à ajouter plus tard pour choisir la forme, ellipse, rectangle, (plus dur triangle, star)
-// function placeSquare(){
-//   if (mouseIsPressed){
-//     let X1 = mouseX;
-//     let X2 = mouse Y;
-//     let test = 
-//     rect(mouseX, mouseY, )
-//   }
-// }
-
-
-let buttonClar = document.getElementById("clear");
-buttonClar.addEventListener("click", clearCanvas);
-
-function placeRectangle(x, y) {
-  const p = window.p5Instance;
-  p.fill(0);
-  p.rect(x, y, 10, 10);
-}
-
-function clearCanvas() {
-  const p = window.p5Instance;
-  p.background(220);
-}
-
-console.log(windowSizeWidth, windowSizeHeight);
-
-
