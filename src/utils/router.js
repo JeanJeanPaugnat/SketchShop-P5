@@ -2,8 +2,13 @@
 const routes = {
   '/': {
     title: 'Accueil - mini-photoshop-vue',
-    render: () => {
+    render: async () => {
       const app = document.getElementById('app');
+      const templateHome = await fetch('/src/template.html');
+      const templateHTML = await templateHome.text();
+      app.innerHTML = templateHTML;
+
+      const module = await import ('/src/page.js')
     }
   },
   '/canvas': {
