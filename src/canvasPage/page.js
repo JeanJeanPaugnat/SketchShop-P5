@@ -1,6 +1,8 @@
 import p5 from "p5";
 import { canvasState, setColor, setTool } from '../utils/canvasState.js';
 import { drawPencil, drawSquare, clearCanvas } from '../utils/drawing.js';
+import { C } from '../exportPage/export.js';
+
 
 let pInstance = null;
 
@@ -24,6 +26,7 @@ export function createCanvas(width, height) {
             p.setup = () => {
                 p.createCanvas(width, height);
                 p.background(220);
+
             };
 
                         
@@ -80,5 +83,17 @@ export function createCanvas(width, height) {
             clearCanvas(p); 
         });
     }
+
+    const exportBtn = document.getElementById("export");
+    if (exportBtn) {
+        exportBtn.addEventListener("click", () => {
+            // p.saveCanvas('mini-photoshop', 'png');
+            C.init(p);
+        });
+    }
     
 }
+
+
+
+// saveCanvas(selectedCanvas, [filename], [extension])
