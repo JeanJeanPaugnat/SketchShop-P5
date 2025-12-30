@@ -1,6 +1,8 @@
 import p5 from "p5";
 import { canvasState, setColor, setTool } from '../utils/canvasState.js';
 import { drawPencil, drawSquare, clearCanvas } from '../utils/drawing.js';
+import {  } from '../exportPage/export.js';
+
 
 let pInstance = null;
 
@@ -90,5 +92,7 @@ export function createCanvas(width, height) {
     }
     
 }
+
+
 
 // saveCanvas(selectedCanvas, [filename], [extension])

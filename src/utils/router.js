@@ -52,7 +52,7 @@ const routes = {
       document.head.appendChild(linkElement);
       
       // Charger et exécuter le script
-      const module = await import('../exportPage/page.js');
+      const module = await import('../exportPage/export.js');
     }
   }
 };
