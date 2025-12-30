@@ -24,6 +24,7 @@ export function createCanvas(width, height) {
             p.setup = () => {
                 p.createCanvas(width, height);
                 p.background(220);
+
             };
 
                         
@@ -80,5 +81,14 @@ export function createCanvas(width, height) {
             clearCanvas(p); 
         });
     }
+
+    const exportBtn = document.getElementById("export");
+    if (exportBtn) {
+        exportBtn.addEventListener("click", () => {
+            p.saveCanvas('mini-photoshop', 'png');
+        });
+    }
     
 }
+
+// saveCanvas(selectedCanvas, [filename], [extension])
