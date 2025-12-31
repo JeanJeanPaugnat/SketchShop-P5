@@ -1,8 +1,9 @@
 export const canvasState = {
-    color: 'red',
+    color: 'black',
     tool: 'pencil',
     width: 800,
-    height: 600
+    height: 600,
+    brushSize: 5,
 };
 
 export function setColor(color) { 
