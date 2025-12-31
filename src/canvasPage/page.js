@@ -1,20 +1,23 @@
 import p5 from "p5";
 import { canvasState, setColor, setTool } from '../utils/canvasState.js';
-import { drawPencil, drawSquare, clearCanvas } from '../utils/drawing.js';
+import { drawPencil, erasePencil, drawRectangle, clearCanvas } from '../utils/drawing.js';
 import { C } from '../exportPage/export.js';
 
 
 let pInstance = null;
+let calque2 = null;
+let startX = 0;
+let startY = 0;
 
 export function createCanvas(width, height) {
-    // 1. Mettre à jour l'état
+
     canvasState.width = width;
     canvasState.height = height;
     
     let inputWidth = document.querySelector("#custom-width");
     let inputHeight = document.querySelector("#custom-height");
 
-    // Assigner les valeurs aux inputs
+
     if (inputWidth && inputHeight) {
         inputWidth.value = width;
         inputHeight.value = height;
@@ -27,24 +30,64 @@ export function createCanvas(width, height) {
                 p.createCanvas(width, height);
                 p.background(220);
 
+                calque2 = p.createGraphics(width, height);
+                calque2.clear(); 
             };
 
-                        
-            // CETTE FONCTION S'APPELLE À CHAQUE FRAME (60x par seconde)
             p.draw = () => {
-                // Si on dessine au crayon ET qu'on bouge la souris
+
+                p.background(220);
+                p.image(calque2, 0, 0);
+                
                 if (canvasState.tool === 'pencil' && p.mouseIsPressed) {
-                    drawPencil(p, p.mouseX, p.mouseY);  // appelle le dessin
+                    drawPencil(calque2, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+                }
+                
+                if (canvasState.tool === 'eraser' && p.mouseIsPressed) {
+                    erasePencil(calque2, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+                }
+
+                if (canvasState.tool === 'square' && canvasState.rectangleStart && p.mouseIsPressed) {
+                    p.push();
+                    p.fill(canvasState.color);
+                    p.noStroke();
+                    p.rect(
+                        canvasState.rectangleStart.x, 
+                        canvasState.rectangleStart.y,
+                        p.mouseX - canvasState.rectangleStart.x,
+                        p.mouseY - canvasState.rectangleStart.y
+                    );
+                    p.pop();
                 }
             };
-                        // Quand on lâche la souris
+
+            p.mousePressed = () => {
+                if (canvasState.tool === 'square') {
+                        canvasState.rectangleStart = { x: p.mouseX, y: p.mouseY };
+                        console.log("Début rectangle:", canvasState.rectangleStart);
+
+                }
+            };
+
             p.mouseReleased = () => {
-                canvasState.isDrawing = false;
-            };
-                    });
+                if (canvasState.tool === 'square' && canvasState.rectangleStart) {
+                    // Dessiner le rectangle final sur le calque
+                    drawRectangle(
+                        calque2,
+                        canvasState.rectangleStart.x,
+                        canvasState.rectangleStart.y,
+                        p.mouseX,
+                        p.mouseY
+                    );
+                    console.log("Rectangle dessiné");
+                    // Reset
+                    canvasState.rectangleStart = null;
                 }
-                // 3. Attacher les écouteurs des BOUTONS
-            attachButtonListeners(pInstance);
+            };
+        });
+    }
+    // Attacher les écouteurs des BOUTONS
+    attachButtonListeners(pInstance);
 }
 
 
@@ -58,21 +101,36 @@ export function createCanvas(width, height) {
             pencilBtn.style.backgroundColor = 'yellow';  // retour visuel
         });
     }
+    // Bouton ERASER
+    const eraserBtn = document.getElementById("eraser");
+    if (eraserBtn) {
+        eraserBtn.addEventListener("click", () => {
+            setTool('eraser');
+            eraserBtn.style.backgroundColor = 'yellow';
+        });
+    }
     
-    // Bouton SQUARE
-    const squareBtn = document.getElementById("square");
-    if (squareBtn) {
-        squareBtn.addEventListener("click", () => {
-            setTool('square');
-            squareBtn.style.backgroundColor = 'yellow';
+    // // Bouton SQUARE
+    // const squareBtn = document.getElementById("square");
+    // if (squareBtn) {
+    //     squareBtn.addEventListener("click", () => {
+    //         setTool('square');
+    //         squareBtn.style.backgroundColor = 'yellow';
+    //     });
+    // }
+
+    const brushSizeInput = document.getElementById("brush-size");
+    if (brushSizeInput) {
+        brushSizeInput.addEventListener("input", (e) => {
+            canvasState.brushSize = parseInt(e.target.value, 10);
         });
     }
     
     // Sélecteur COULEUR
-    const colorSelect = document.getElementById("colorChange");
-    if (colorSelect) {
-        colorSelect.addEventListener("change", (e) => {
-            setColor(e.target.value);  // change la couleur dans l'état
+    const colorPicker = document.getElementById("colorPicker");
+    if (colorPicker) {
+        colorPicker.addEventListener("change", (e) => {
+            setColor(e.target.value); 
         });
     }
     
@@ -80,20 +138,38 @@ export function createCanvas(width, height) {
     const clearBtn = document.getElementById("clear");
     if (clearBtn) {
         clearBtn.addEventListener("click", () => {
-            clearCanvas(p); 
+            clearCanvas(calque2); 
         });
     }
 
     const exportBtn = document.getElementById("export");
     if (exportBtn) {
         exportBtn.addEventListener("click", () => {
-            // p.saveCanvas('mini-photoshop', 'png');
-            C.init(p);
+            C.init(pInstance);
         });
     }
-    
+
+    const squareBtn = document.getElementById("shape-square");
+    if (squareBtn) {
+        squareBtn.addEventListener("click", () => {
+            setTool('square');
+            squareBtn.style.backgroundColor = 'yellow';
+            console.log("Outil rectangle activé");
+        });
+    }
+
+    // function mousePressed() {
+    //     startX = p.mouseX;
+    //     startY = p.mouseY;
+    // }
+
+    // function mouseDragged() {
+    //     if (canvasState.tool === 'square') {
+    //         let mouseX = p.mouseX;
+    //         let mouseY = p.mouseY;
+    //         drawRectangle(calque2, startX, startY, mouseX, mouseY);
+    //     }
+    // }
+
+
 }
-
-
-
-// saveCanvas(selectedCanvas, [filename], [extension])
