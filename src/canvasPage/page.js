@@ -1,11 +1,13 @@
 import p5 from "p5";
 import { canvasState, setColor, setTool } from '../utils/canvasState.js';
-import { drawPencil, erasePencil, drawSquare, clearCanvas } from '../utils/drawing.js';
+import { drawPencil, erasePencil, drawRectangle, clearCanvas } from '../utils/drawing.js';
 import { C } from '../exportPage/export.js';
 
 
 let pInstance = null;
 let calque2 = null;
+let startX = 0;
+let startY = 0;
 
 export function createCanvas(width, height) {
 
@@ -44,10 +46,43 @@ export function createCanvas(width, height) {
                 if (canvasState.tool === 'eraser' && p.mouseIsPressed) {
                     erasePencil(calque2, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
                 }
+
+                if (canvasState.tool === 'square' && canvasState.rectangleStart && p.mouseIsPressed) {
+                    p.push();
+                    p.fill(canvasState.color);
+                    p.noStroke();
+                    p.rect(
+                        canvasState.rectangleStart.x, 
+                        canvasState.rectangleStart.y,
+                        p.mouseX - canvasState.rectangleStart.x,
+                        p.mouseY - canvasState.rectangleStart.y
+                    );
+                    p.pop();
+                }
+            };
+
+            p.mousePressed = () => {
+                if (canvasState.tool === 'square') {
+                        canvasState.rectangleStart = { x: p.mouseX, y: p.mouseY };
+                        console.log("Début rectangle:", canvasState.rectangleStart);
+
+                }
             };
 
             p.mouseReleased = () => {
-                canvasState.isDrawing = false;
+                if (canvasState.tool === 'square' && canvasState.rectangleStart) {
+                    // Dessiner le rectangle final sur le calque
+                    drawRectangle(
+                        calque2,
+                        canvasState.rectangleStart.x,
+                        canvasState.rectangleStart.y,
+                        p.mouseX,
+                        p.mouseY
+                    );
+                    console.log("Rectangle dessiné");
+                    // Reset
+                    canvasState.rectangleStart = null;
+                }
             };
         });
     }
@@ -75,14 +110,14 @@ export function createCanvas(width, height) {
         });
     }
     
-    // Bouton SQUARE
-    const squareBtn = document.getElementById("square");
-    if (squareBtn) {
-        squareBtn.addEventListener("click", () => {
-            setTool('square');
-            squareBtn.style.backgroundColor = 'yellow';
-        });
-    }
+    // // Bouton SQUARE
+    // const squareBtn = document.getElementById("square");
+    // if (squareBtn) {
+    //     squareBtn.addEventListener("click", () => {
+    //         setTool('square');
+    //         squareBtn.style.backgroundColor = 'yellow';
+    //     });
+    // }
 
     const brushSizeInput = document.getElementById("brush-size");
     if (brushSizeInput) {
@@ -113,5 +148,28 @@ export function createCanvas(width, height) {
             C.init(pInstance);
         });
     }
-    
+
+    const squareBtn = document.getElementById("shape-square");
+    if (squareBtn) {
+        squareBtn.addEventListener("click", () => {
+            setTool('square');
+            squareBtn.style.backgroundColor = 'yellow';
+            console.log("Outil rectangle activé");
+        });
+    }
+
+    // function mousePressed() {
+    //     startX = p.mouseX;
+    //     startY = p.mouseY;
+    // }
+
+    // function mouseDragged() {
+    //     if (canvasState.tool === 'square') {
+    //         let mouseX = p.mouseX;
+    //         let mouseY = p.mouseY;
+    //         drawRectangle(calque2, startX, startY, mouseX, mouseY);
+    //     }
+    // }
+
+
 }

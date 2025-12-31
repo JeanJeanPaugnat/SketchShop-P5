@@ -25,3 +25,10 @@ export function drawSquare(graphics, x, y, size) {
 export function clearCanvas(graphics) {
     graphics.clear();
 }
+
+// dessiner un rectangle
+export function drawRectangle(graphics, x1, y1, x2, y2) {
+    graphics.fill(canvasState.color);
+    graphics.noStroke();
+    graphics.rect(x1, y1, x2 - x1, y2 - y1);
+}

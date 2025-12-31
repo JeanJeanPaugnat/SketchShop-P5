@@ -4,6 +4,8 @@ export const canvasState = {
     width: 800,
     height: 600,
     brushSize: 5,
+    isDrawing: true,
+    rectangleStart: null, 
 };
 
 export function setColor(color) { 
