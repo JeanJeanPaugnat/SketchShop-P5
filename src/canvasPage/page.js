@@ -1,7 +1,7 @@
 import p5 from "p5";
 import { canvasState, setColor, setTool } from '../utils/canvasState.js';
 import { drawPencil, erasePencil, drawRectangle, clearCanvas } from '../utils/drawing.js';
-import { applyThresholdFilter } from '../utils/filters.js'
+import { applyThresholdFilter, applyPixelateFilter } from '../utils/filters.js'
 
 import { C } from '../exportPage/export.js';
 
@@ -166,11 +166,20 @@ export function createCanvas(width, height) {
         });
     }
 
+    const pixelateBtn = document.querySelector(".filter-pixelate");
+    if (pixelateBtn) {
+        pixelateBtn.addEventListener("click", () => {
+            // Appliquer le filtre pixelate ici
+            applyPixelateFilter(calque2, 10);
+            console.log("Filtre pixelate appliqué");
+        });
+    }
+
     const filterThresholdBtn = document.querySelector(".filter-threshold");
     if (filterThresholdBtn) {
         filterThresholdBtn.addEventListener("click", () => {
             // Appliquer le filtre de seuil ici
-            applyThresholdFilter(calque2, 128); // Exemple avec un seuil de 128
+            applyThresholdFilter(calque2, 128);
             console.log("Filtre de seuil appliqué");
         });
     }
