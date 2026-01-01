@@ -97,29 +97,45 @@ export function applyAsciiFilter(graphics, scale) {
     const ctx = graphics.canvas.getContext('2d');
     const w = graphics.canvas.width;
     const h = graphics.canvas.height;
+    console.log('[ASCII] canvas device size:', w, h);
+    console.log('[ASCII] graphics logical size:', graphics.width, graphics.height);
+    console.log('[ASCII] pixelDensity():', graphics.pixelDensity ? graphics.pixelDensity() : 'n/a');
+    const pd = graphics.pixelDensity ? graphics.pixelDensity() : 1;
+    const logicalW = graphics.width;
+    const logicalH = graphics.height;
+
     const imageData = ctx.getImageData(0, 0, w, h);
     const data = imageData.data;
+    console.log('[ASCII] data length:', data.length, 'expected:', w * h * 4);
 
-    // Effacer le canvas avant de dessiner le texte
-    // ctx.fillStyle = 'white';
-    // ctx.fillRect(0, 0, w, h);
+    // Sauvegarder l'état initial pour ne rien casser pour le dessin ensuite
+    ctx.save();
+
+    // Nettoyer en device pixels pour repartir sur fond blanc
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, w, h);
     
+    // Travailler ensuite en coordonnées logiques (CSS) via un scale
+    ctx.scale(pd, pd);
     ctx.fillStyle = 'black';
     ctx.font = `${scale}px monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    for (let y = 0; y < h; y += scale) {
-        for (let x = 0; x < w; x += scale) {
+    const blockSize = scale * pd; // taille du bloc en device pixels pour l'échantillonnage
+
+    for (let y = 0; y < logicalH; y += scale) {
+        for (let x = 0; x < logicalW; x += scale) {
             let red = 0, green = 0, blue = 0, count = 0;
             
-            // Calculer la moyenne RGB du bloc
-            for (let py = 0; py < scale; py++) {
-                for (let px = 0; px < scale; px++) {
-                    let posX = x + px;
-                    let posY = y + py;
+            // Calculer la moyenne RGB du bloc en device pixels
+            for (let py = 0; py < blockSize; py++) {
+                for (let px = 0; px < blockSize; px++) {
+                    const posX = Math.floor((x * pd) + px);
+                    const posY = Math.floor((y * pd) + py);
                     if (posX < w && posY < h) {
-                        let index = (posY * w + posX) * 4;
+                        const index = (posY * w + posX) * 4;
                         red += data[index];
                         green += data[index + 1];
                         blue += data[index + 2];
@@ -128,23 +144,21 @@ export function applyAsciiFilter(graphics, scale) {
                 }
             }
             
-            // Moyenne des couleurs
             red = red / count;
             green = green / count;
             blue = blue / count;
             
-            // Calculer la luminosité (brightness)
-            let brightness = 0.299 * red + 0.587 * green + 0.114 * blue;
+            const brightness = 0.299 * red + 0.587 * green + 0.114 * blue;
             
-            // Mapper la luminosité à un caractère ASCII
-            // Plus c'est sombre (0), plus on va vers '@'
-            // Plus c'est clair (255), plus on va vers ' '
             let charIndex = Math.floor((brightness / 255) * (densityChars.length - 1));
             charIndex = densityChars.length - 1 - charIndex; // Inverser
-            let asciiChar = densityChars[charIndex];
+            const asciiChar = densityChars[charIndex];
             
-            // Dessiner le caractère
-            ctx.fillText(asciiChar, x + scale/2, y + scale/2);
+            // Dessin en coordonnées logiques (le contexte est déjà scalé)
+            ctx.fillText(asciiChar, x + scale / 2, y + scale / 2);
         }
     }
+
+    // Restaurer l'état initial pour que le reste du dessin (p5) garde ses repères
+    ctx.restore();
 }
