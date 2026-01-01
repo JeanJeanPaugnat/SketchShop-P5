@@ -1,7 +1,7 @@
 import p5 from "p5";
 import { canvasState, setColor, setTool } from '../utils/canvasState.js';
 import { drawPencil, erasePencil, drawRectangle, clearCanvas } from '../utils/drawing.js';
-import { applyThresholdFilter, applyPixelateFilter } from '../utils/filters.js'
+import { applyThresholdFilter, applyPixelateFilter, applyAsciiFilter } from '../utils/filters.js'
 
 import { C } from '../exportPage/export.js';
 
@@ -178,7 +178,7 @@ export function createCanvas(width, height) {
             let applyPixelateBtn = document.getElementById("applyPixelateBtn");
             let pixelSizeInput = document.getElementById("pixelSizeInput");
             applyPixelateBtn.addEventListener("click", () => {
-                pixelSize = parseInt(pixelSizeInput.value, 10);
+                let pixelSize = parseInt(pixelSizeInput.value, 10);
                 applyPixelateFilter(calque2, pixelSize);
             });
         });
@@ -191,6 +191,14 @@ export function createCanvas(width, height) {
             // Appliquer le filtre de seuil ici
             applyThresholdFilter(calque2, 128);
             console.log("Filtre de seuil appliqué");
+        });
+    }
+
+    const asciiBtn = document.querySelector(".filter-ascii");
+    if (asciiBtn) {
+        asciiBtn.addEventListener("click", () => {
+            // Appliquer le filtre ASCII ici
+            applyAsciiFilter(calque2, 10);
         });
     }
 

@@ -91,4 +91,60 @@ export function applyPixelateFilter(graphics, pixelSize) {
     ctx.putImageData(imageData, 0, 0);
 }
 
+let densityChars = [' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'];
 
+export function applyAsciiFilter(graphics, scale) {
+    const ctx = graphics.canvas.getContext('2d');
+    const w = graphics.canvas.width;
+    const h = graphics.canvas.height;
+    const imageData = ctx.getImageData(0, 0, w, h);
+    const data = imageData.data;
+
+    // Effacer le canvas avant de dessiner le texte
+    // ctx.fillStyle = 'white';
+    // ctx.fillRect(0, 0, w, h);
+    
+    ctx.fillStyle = 'black';
+    ctx.font = `${scale}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (let y = 0; y < h; y += scale) {
+        for (let x = 0; x < w; x += scale) {
+            let red = 0, green = 0, blue = 0, count = 0;
+            
+            // Calculer la moyenne RGB du bloc
+            for (let py = 0; py < scale; py++) {
+                for (let px = 0; px < scale; px++) {
+                    let posX = x + px;
+                    let posY = y + py;
+                    if (posX < w && posY < h) {
+                        let index = (posY * w + posX) * 4;
+                        red += data[index];
+                        green += data[index + 1];
+                        blue += data[index + 2];
+                        count++;
+                    }
+                }
+            }
+            
+            // Moyenne des couleurs
+            red = red / count;
+            green = green / count;
+            blue = blue / count;
+            
+            // Calculer la luminosité (brightness)
+            let brightness = 0.299 * red + 0.587 * green + 0.114 * blue;
+            
+            // Mapper la luminosité à un caractère ASCII
+            // Plus c'est sombre (0), plus on va vers '@'
+            // Plus c'est clair (255), plus on va vers ' '
+            let charIndex = Math.floor((brightness / 255) * (densityChars.length - 1));
+            charIndex = densityChars.length - 1 - charIndex; // Inverser
+            let asciiChar = densityChars[charIndex];
+            
+            // Dessiner le caractère
+            ctx.fillText(asciiChar, x + scale/2, y + scale/2);
+        }
+    }
+}
