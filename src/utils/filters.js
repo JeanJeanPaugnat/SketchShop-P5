@@ -41,32 +41,48 @@ export function applyPixelateFilter(graphics, pixelSize) {
 
     for (let y = 0; y < h; y += pixelSize) {
         for (let x = 0; x < w; x += pixelSize) {
-            let red = 0, green = 0, blue = 0, count = 0;
+            let red = 0, green = 0, blue = 0, alpha = 0, count = 0;
+            
+            // Calculer la moyenne incluant l'alpha
             for (let py = 0; py < pixelSize; py++) {
                 for (let px = 0; px < pixelSize; px++) {
                     let posX = x + px;
                     let posY = y + py;
                     if (posX < w && posY < h) {
                         let index = (posY * w + posX) * 4;
-                        red += data[index];
-                        green += data[index + 1];
-                        blue += data[index + 2];
-                        count++;
+                        let a = data[index + 3];
+                        
+                        // Ne compter que les pixels non transparents
+                        if (a > 0) {
+                            red += data[index];
+                            green += data[index + 1];
+                            blue += data[index + 2];
+                            alpha += a;
+                            count++;
+                        }
                     }
                 }
-            }   
-            red = red / count;
-            green = green / count;
-            blue = blue / count;
-            for (let py = 0; py < pixelSize; py++) {
-                for (let px = 0; px < pixelSize; px++) {
-                    let posX = x + px;
-                    let posY = y + py;
-                    if (posX < w && posY < h) {
-                        let index = (posY * w + posX) * 4;
-                        data[index] = red;
-                        data[index + 1] = green;
-                        data[index + 2] = blue;
+            }
+            
+            // Si le bloc contient des pixels visibles
+            if (count > 0) {
+                red = red / count;
+                green = green / count;
+                blue = blue / count;
+                alpha = alpha / count;
+                
+                // Appliquer la couleur moyenne au bloc
+                for (let py = 0; py < pixelSize; py++) {
+                    for (let px = 0; px < pixelSize; px++) {
+                        let posX = x + px;
+                        let posY = y + py;
+                        if (posX < w && posY < h) {
+                            let index = (posY * w + posX) * 4;
+                            data[index] = red;
+                            data[index + 1] = green;
+                            data[index + 2] = blue;
+                            data[index + 3] = alpha;
+                        }
                     }
                 }
             }

@@ -170,9 +170,19 @@ export function createCanvas(width, height) {
     if (pixelateBtn) {
         pixelateBtn.addEventListener("click", () => {
             // Appliquer le filtre pixelate ici
-            applyPixelateFilter(calque2, 10);
-            console.log("Filtre pixelate appliqué");
+            let appToModify = document.getElementById("appToModify");
+            let sectionPixelate = '<input type="number" id="pixelSizeInput" value="10" min="1" max="100"/><button id="applyPixelateBtn">Apply Pixelate</button>';
+            if (!document.getElementById("applyPixelateBtn")) {
+                appToModify.insertAdjacentHTML('beforeend', sectionPixelate);
+            }
+            let applyPixelateBtn = document.getElementById("applyPixelateBtn");
+            let pixelSizeInput = document.getElementById("pixelSizeInput");
+            applyPixelateBtn.addEventListener("click", () => {
+                pixelSize = parseInt(pixelSizeInput.value, 10);
+                applyPixelateFilter(calque2, pixelSize);
+            });
         });
+
     }
 
     const filterThresholdBtn = document.querySelector(".filter-threshold");
