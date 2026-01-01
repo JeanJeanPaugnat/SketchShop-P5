@@ -1,6 +1,8 @@
 import p5 from "p5";
 import { canvasState, setColor, setTool } from '../utils/canvasState.js';
 import { drawPencil, erasePencil, drawRectangle, clearCanvas } from '../utils/drawing.js';
+import { applyThresholdFilter, applyPixelateFilter, applyAsciiFilter } from '../utils/filters.js'
+
 import { C } from '../exportPage/export.js';
 
 
@@ -31,7 +33,13 @@ export function createCanvas(width, height) {
                 p.background(220);
 
                 calque2 = p.createGraphics(width, height);
-                calque2.clear(); 
+                calque2.clear();
+                
+                // Activer la lecture fréquente des pixels pour les filtres
+                if (calque2.canvas) {
+                    const ctx = calque2.canvas.getContext('2d');
+                    if (ctx) ctx.willReadFrequently = true;
+                } 
             };
 
             p.draw = () => {
@@ -155,6 +163,42 @@ export function createCanvas(width, height) {
             setTool('square');
             squareBtn.style.backgroundColor = 'yellow';
             console.log("Outil rectangle activé");
+        });
+    }
+
+    const pixelateBtn = document.querySelector(".filter-pixelate");
+    if (pixelateBtn) {
+        pixelateBtn.addEventListener("click", () => {
+            // Appliquer le filtre pixelate ici
+            let appToModify = document.getElementById("appToModify");
+            let sectionPixelate = '<input type="number" id="pixelSizeInput" value="10" min="1" max="100"/><button id="applyPixelateBtn">Apply Pixelate</button>';
+            if (!document.getElementById("applyPixelateBtn")) {
+                appToModify.insertAdjacentHTML('beforeend', sectionPixelate);
+            }
+            let applyPixelateBtn = document.getElementById("applyPixelateBtn");
+            let pixelSizeInput = document.getElementById("pixelSizeInput");
+            applyPixelateBtn.addEventListener("click", () => {
+                let pixelSize = parseInt(pixelSizeInput.value, 10);
+                applyPixelateFilter(calque2, pixelSize);
+            });
+        });
+
+    }
+
+    const filterThresholdBtn = document.querySelector(".filter-threshold");
+    if (filterThresholdBtn) {
+        filterThresholdBtn.addEventListener("click", () => {
+            // Appliquer le filtre de seuil ici
+            applyThresholdFilter(calque2, 128);
+            console.log("Filtre de seuil appliqué");
+        });
+    }
+
+    const asciiBtn = document.querySelector(".filter-ascii");
+    if (asciiBtn) {
+        asciiBtn.addEventListener("click", () => {
+            // Appliquer le filtre ASCII ici
+            applyAsciiFilter(calque2, 10);
         });
     }
 
