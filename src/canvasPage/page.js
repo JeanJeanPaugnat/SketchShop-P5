@@ -157,6 +157,22 @@ export function createCanvas(width, height) {
         });
     }
 
+
+    //need to fix upload button
+    const uploadBtn = document.getElementById("upload");
+    if (uploadBtn) {
+        uploadBtn.addEventListener("click", () => {
+            console.log("Upload button clicked");
+            
+            // let appToModify = document.getElementById("appToModify");
+            // let existingSection = document.getElementById("upload-section");
+            // if (existingSection) {
+            //     existingSection.remove(); // Supprimer l'ancienne section
+            // }
+            // V.renderUpload(appToModify);
+        });
+    }
+
     const squareBtn = document.getElementById("shape-square");
     if (squareBtn) {
         squareBtn.addEventListener("click", () => {
