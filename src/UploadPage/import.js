@@ -20,7 +20,7 @@ C.init = function (p5Instance) {
     M.p5Instance = p5Instance;
     let appToModify = document.getElementById("appToModify");
 
-    let existingSection = document.getElementById("export-section");
+    let existingSection = document.getElementById("upload-section");
     if (existingSection) {
         existingSection.remove(); // Supprimer l'ancienne section
     }
@@ -30,15 +30,22 @@ C.init = function (p5Instance) {
 }
 
 C.attachListeners = function () {
-    let buttonsExport = document.querySelectorAll('button[id^="download"]');
-    buttonsExport.forEach(button => {
-        button.addEventListener("click", () => {
-            let format = button.getAttribute("data-format");
-            let filename = document.querySelector('#filename').value;
-            V.exportCanvas(filename, format);
+    let fileImg = document.querySelector('#file-input');
+    fileImg.addEventListener('change', (event) => {
+        // utiliser loadImage de p5 pour charger l'image
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = M.p5Instance.loadImage(e.target.result, () => {
+                    // une fois l'image chargée, la dessiner sur le canvas
+                    M.p5Instance.clear();
+                    M.p5Instance.resizeCanvas(img.width, img.height);
+                    M.p5Instance.image(img, 0, 0);
+                });
+            };
+            reader.readAsDataURL(file);
         }
-    );
-
     });
 
 }
