@@ -32,6 +32,7 @@ C.init = function (p5Instance, calque2) {
     C.attachListeners();
 }
 
+
 C.attachListeners = function () {
     let fileImg = document.querySelector('#file-input');
     fileImg.addEventListener('change', (event) => {
@@ -41,10 +42,7 @@ C.attachListeners = function () {
             const reader = new FileReader();
             reader.onload = function (e) {
                 M.p5Instance.loadImage(e.target.result, (loadedImg) => {
-                    // loadedImg est l'image chargée, dessiner sur calque2
-                    if (M.calque2) {
                         M.calque2.image(loadedImg, 0, 0);
-                    }
                 });
             };
             reader.readAsDataURL(file);

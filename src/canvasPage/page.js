@@ -32,20 +32,14 @@ export function createCanvas(width, height) {
         pInstance = new p5((p) => {
 
             p.setup = async () => {
-                baseImage = await new Promise((resolve) => {
-                    p.loadImage('../src/canvasPage/test.png', resolve);
-                });
                 
-                p.createCanvas(width, height);
-                p.background(220);
+                const canvas = p.createCanvas(width, height);
+
+                canvas.drop(handleFileDrop);
+
 
                 calque2 = p.createGraphics(width, height);
                 calque2.clear();
-                
-                // Dessiner l'image de base sur calque2
-                if (baseImage) {
-                    calque2.image(baseImage, 0, 0);
-                }
                 
                 // Activer la lecture fréquente des pixels pour les filtres
                 if (calque2.canvas) {
@@ -56,7 +50,7 @@ export function createCanvas(width, height) {
 
             p.draw = () => {
 
-                p.background(220);
+                p.background(255);
                 p.image(calque2, 0, 0);
                 
                 if (canvasState.tool === 'pencil' && p.mouseIsPressed) {
@@ -108,6 +102,21 @@ export function createCanvas(width, height) {
     }
     // Attacher les écouteurs des BOUTONS
     attachButtonListeners(pInstance);
+}
+
+// Gestion du drop p5 (fichier image)
+function handleFileDrop(file) {
+    if (file && file.type === 'image') {
+        // file.data est une DataURL prête à être chargée
+        const dataURL = file.data;
+        const p = pInstance;
+        if (!p || !calque2) return;
+
+        p.loadImage(dataURL, (loadedImg) => {
+            baseImage = loadedImg; // garde une référence si besoin plus tard
+            calque2.image(loadedImg, 0, 0);
+        });
+    }
 }
 
 
