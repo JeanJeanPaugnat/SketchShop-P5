@@ -10,14 +10,17 @@ import './style.css';
 
 let M = {
     p5Instance: null,
+    calque2: null,
 };
 
 
 
 let C = {};
 
-C.init = function (p5Instance) {
+C.init = function (p5Instance, calque2) {
     M.p5Instance = p5Instance;
+    M.calque2 = calque2;
+    console.log(M.p5Instance);
     let appToModify = document.getElementById("appToModify");
 
     let existingSection = document.getElementById("upload-section");
@@ -37,11 +40,11 @@ C.attachListeners = function () {
         if (file) {
             const reader = new FileReader();
             reader.onload = function (e) {
-                const img = M.p5Instance.loadImage(e.target.result, () => {
-                    // une fois l'image chargée, la dessiner sur le canvas
-                    M.p5Instance.clear();
-                    M.p5Instance.resizeCanvas(img.width, img.height);
-                    M.p5Instance.image(img, 0, 0);
+                M.p5Instance.loadImage(e.target.result, (loadedImg) => {
+                    // loadedImg est l'image chargée, dessiner sur calque2
+                    if (M.calque2) {
+                        M.calque2.image(loadedImg, 0, 0);
+                    }
                 });
             };
             reader.readAsDataURL(file);

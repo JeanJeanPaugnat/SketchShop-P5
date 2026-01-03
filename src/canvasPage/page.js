@@ -175,7 +175,7 @@ export function createCanvas(width, height) {
     if (uploadBtn) {
         uploadBtn.addEventListener("click", () => {
             console.log("Upload button clicked");
-                uploadP.init(pInstance);
+                uploadP.init(pInstance, calque2);
             // let appToModify = document.getElementById("appToModify");
             // let existingSection = document.getElementById("upload-section");
             // if (existingSection) {
