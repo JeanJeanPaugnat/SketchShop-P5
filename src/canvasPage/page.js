@@ -3,13 +3,15 @@ import { canvasState, setColor, setTool } from '../utils/canvasState.js';
 import { drawPencil, erasePencil, drawRectangle, clearCanvas } from '../utils/drawing.js';
 import { applyThresholdFilter, applyPixelateFilter, applyAsciiFilter } from '../utils/filters.js'
 
-import { C } from '../exportPage/export.js';
+import { C as exportP } from '../exportPage/export.js';
+import { C as uploadP } from '../UploadPage/import.js';
 
 
 let pInstance = null;
 let calque2 = null;
 let startX = 0;
 let startY = 0;
+let baseImage = null;
 
 export function createCanvas(width, height) {
 
@@ -28,9 +30,13 @@ export function createCanvas(width, height) {
 
     if (!pInstance) {
         pInstance = new p5((p) => {
-            p.setup = () => {
-                p.createCanvas(width, height);
-                p.background(220);
+
+            p.setup = async () => {
+                
+                const canvas = p.createCanvas(width, height);
+
+                canvas.drop(handleFileDrop);
+
 
                 calque2 = p.createGraphics(width, height);
                 calque2.clear();
@@ -44,7 +50,7 @@ export function createCanvas(width, height) {
 
             p.draw = () => {
 
-                p.background(220);
+                p.background(255);
                 p.image(calque2, 0, 0);
                 
                 if (canvasState.tool === 'pencil' && p.mouseIsPressed) {
@@ -96,6 +102,21 @@ export function createCanvas(width, height) {
     }
     // Attacher les écouteurs des BOUTONS
     attachButtonListeners(pInstance);
+}
+
+// Gestion du drop p5 (fichier image)
+function handleFileDrop(file) {
+    if (file && file.type === 'image') {
+        // file.data est une DataURL prête à être chargée
+        const dataURL = file.data;
+        const p = pInstance;
+        if (!p || !calque2) return;
+
+        p.loadImage(dataURL, (loadedImg) => {
+            baseImage = loadedImg; // garde une référence si besoin plus tard
+            calque2.image(loadedImg, 0, 0);
+        });
+    }
 }
 
 
@@ -153,7 +174,23 @@ export function createCanvas(width, height) {
     const exportBtn = document.getElementById("export");
     if (exportBtn) {
         exportBtn.addEventListener("click", () => {
-            C.init(pInstance);
+            exportP.init(pInstance);
+        });
+    }
+
+
+    //need to fix upload button
+    const uploadBtn = document.getElementById("upload");
+    if (uploadBtn) {
+        uploadBtn.addEventListener("click", () => {
+            console.log("Upload button clicked");
+                uploadP.init(pInstance, calque2);
+            // let appToModify = document.getElementById("appToModify");
+            // let existingSection = document.getElementById("upload-section");
+            // if (existingSection) {
+            //     existingSection.remove(); // Supprimer l'ancienne section
+            // }
+            // V.renderUpload(appToModify);
         });
     }
 
