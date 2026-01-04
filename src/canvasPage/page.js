@@ -13,6 +13,9 @@ let startX = 0;
 let startY = 0;
 let baseImage = null;
 
+let calques = [];
+let activeCalqueIndex = 0;
+
 export function createCanvas(width, height) {
 
     canvasState.width = width;
@@ -37,13 +40,12 @@ export function createCanvas(width, height) {
 
                 canvas.drop(handleFileDrop);
 
-
-                calque2 = p.createGraphics(width, height);
-                calque2.clear();
+                addNewLayer('calque1'); // Ajouter un calque initial
                 
+                calques[0].graphics.background(0); // Fond blanc pour le calque de base
                 // Activer la lecture fréquente des pixels pour les filtres
-                if (calque2.canvas) {
-                    const ctx = calque2.canvas.getContext('2d');
+                if (calques[0].graphics.canvas) {
+                    const ctx = calques[0].graphics.canvas.getContext('2d');
                     if (ctx) ctx.willReadFrequently = true;
                 } 
             };
@@ -51,14 +53,20 @@ export function createCanvas(width, height) {
             p.draw = () => {
 
                 p.background(255);
-                p.image(calque2, 0, 0);
+
+                for (let i = 0; i < calques.length; i++) {
+                    let layer = calques[i];
+                    if (layer.visible) {
+                    p.image(layer.graphics, 0, 0);
+                    }
+                }
                 
                 if (canvasState.tool === 'pencil' && p.mouseIsPressed) {
-                    drawPencil(calque2, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+                    drawPencil(calques[activeCalqueIndex].graphics, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
                 }
                 
                 if (canvasState.tool === 'eraser' && p.mouseIsPressed) {
-                    erasePencil(calque2, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+                    erasePencil(calques[activeCalqueIndex].graphics, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
                 }
 
                 if (canvasState.tool === 'square' && canvasState.rectangleStart && p.mouseIsPressed) {
@@ -119,9 +127,78 @@ function handleFileDrop(file) {
     }
 }
 
+function addNewLayer(name) {
+    const p = pInstance;
+    if (!p) return;
+    const newCalque = p.createGraphics(canvasState.width, canvasState.height);
+
+    let layerObj = {
+        graphics: newCalque,
+        name: name || `Calque ${calques.length + 1}`,
+        visible: true
+    };
+    calques.push(layerObj);
+    calque2 = newCalque;
+    activeCalqueIndex = calques.length - 1;
+    updateLayerUI();
+}
+
+function setActiveLayer(index) {
+  activeCalqueIndex = index;
+  updateLayerUI();
+}
+
+function updateLayerUI() {
+    let list = document.querySelector('.layers');
+    list.innerHTML = '';
+    for (let i = calques.length - 1; i >= 0; i--) {
+        let li = document.createElement('li');
+
+        if (i === activeCalqueIndex) {
+        li.style.backgroundColor = '#0c3e69ff';
+        } else {
+        li.style.backgroundColor = '#575757ff';
+        }
+
+        li.addEventListener('click', () => setActiveLayer(i));
+        let spanName = document.createElement('span');
+        spanName.textContent = calques[i].name;
+        // Bouton Toggle Visibilité (petit bonus)
+        let btnEye = document.createElement('button');
+        btnEye.textContent = calques[i].visible ? '👁️' : '🚫';
+        btnEye.addEventListener('click', (e) => {
+            e.stopPropagation(); // Empêche de sélectionner le calque quand on clique l'oeil
+            toggleVisibility(i);
+        });
+        
+        li.appendChild(spanName);
+        li.appendChild(btnEye);
+        list.appendChild(li);
+
+    }
+}
+
+
+
+
+
+function toggleVisibility(index) {
+  calques[index].visible = !calques[index].visible;
+  updateLayerUI();
+}
 
 
     function attachButtonListeners(p) {
+
+    const layerBtn = document.getElementById("new-layer");
+    const layerNameInput = document.getElementById("layer-name");
+    if (layerBtn) {
+        layerBtn.addEventListener("click", () => {
+            addNewLayer(layerNameInput.value);
+            console.log("Nouveau calque ajouté. Total calques:", calques.length);
+        });
+    }
+
     // Bouton PENCIL
     const pencilBtn = document.getElementById("pencil");
     if (pencilBtn) {
