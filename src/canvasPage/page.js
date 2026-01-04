@@ -124,21 +124,66 @@ function addNewLayer(name) {
     const p = pInstance;
     if (!p) return;
     const newCalque = p.createGraphics(canvasState.width, canvasState.height);
-    newCalque.clear();
-    calques.push(newCalque);
+
+    let layerObj = {
+        graphics: newCalque,
+        name: name || `Calque ${calques.length + 1}`,
+        visible: true
+    };
+    calques.push(layerObj);
+    calque2 = newCalque; // Pour l'instant, on travaille sur le nouveau calque
     activeCalqueIndex = calques.length - 1;
-    calque2 = newCalque;
-    let test = document.querySelector(".layers");
-    if (test) {
-        let li = document.createElement("li");
-        li.textContent = name || `Calque ${calques.length}`;
-        test.appendChild(li);
+    updateLayerUI();
+}
+
+function setActiveLayer(index) {
+  activeCalqueIndex = index;
+  updateLayerUI(); // Pour changer la couleur du bouton sélectionné
+}
+
+function updateLayerUI() {
+    let list = document.querySelector('.layers');
+    list.innerHTML = '';
+    for (let i = calques.length - 1; i >= 0; i--) {
+        let li = document.createElement('li');
+
+        li.style.padding = '10px';
+        li.style.borderBottom = '1px solid #575757ff';
+        li.style.cursor = 'pointer';
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        if (i === activeCalqueIndex) {
+        li.style.backgroundColor = '#0c3e69ff';
+        } else {
+        li.style.backgroundColor = '#575757ff';
+        }
+
+        li.addEventListener('click', () => setActiveLayer(i));
+        let spanName = document.createElement('span');
+        spanName.textContent = calques[i].name;
+        // Bouton Toggle Visibilité (petit bonus)
+        let btnEye = document.createElement('button');
+        btnEye.textContent = calques[i].visible ? '👁️' : '🚫';
+        btnEye.addEventListener('click', (e) => {
+            e.stopPropagation(); // Empêche de sélectionner le calque quand on clique l'oeil
+            toggleVisibility(i);
+        });
+        
+        li.appendChild(spanName);
+        li.appendChild(btnEye);
+        list.appendChild(li);
+
     }
 }
 
 
 
 
+
+function toggleVisibility(index) {
+  calques[index].visible = !calques[index].visible;
+  updateLayerUI();
+}
 
 
     function attachButtonListeners(p) {
