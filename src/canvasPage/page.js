@@ -14,7 +14,7 @@ let startY = 0;
 let baseImage = null;
 
 let calques = [];
-let activeCalqueIndex = -1;
+let activeCalqueIndex = 0;
 
 export function createCanvas(width, height) {
 
@@ -42,9 +42,10 @@ export function createCanvas(width, height) {
 
                 addNewLayer('calque1'); // Ajouter un calque initial
                 
+                calques[0].graphics.background(0); // Fond blanc pour le calque de base
                 // Activer la lecture fréquente des pixels pour les filtres
-                if (calque2.canvas) {
-                    const ctx = calque2.canvas.getContext('2d');
+                if (calques[0].graphics.canvas) {
+                    const ctx = calques[0].graphics.canvas.getContext('2d');
                     if (ctx) ctx.willReadFrequently = true;
                 } 
             };
@@ -52,14 +53,20 @@ export function createCanvas(width, height) {
             p.draw = () => {
 
                 p.background(255);
-                p.image(calque2, 0, 0);
+
+                for (let i = 0; i < calques.length; i++) {
+                    let layer = calques[i];
+                    if (layer.visible) {
+                    p.image(layer.graphics, 0, 0);
+                    }
+                }
                 
                 if (canvasState.tool === 'pencil' && p.mouseIsPressed) {
-                    drawPencil(calque2, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+                    drawPencil(calques[activeCalqueIndex].graphics, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
                 }
                 
                 if (canvasState.tool === 'eraser' && p.mouseIsPressed) {
-                    erasePencil(calque2, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+                    erasePencil(calques[activeCalqueIndex].graphics, p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
                 }
 
                 if (canvasState.tool === 'square' && canvasState.rectangleStart && p.mouseIsPressed) {
@@ -131,14 +138,14 @@ function addNewLayer(name) {
         visible: true
     };
     calques.push(layerObj);
-    calque2 = newCalque; // Pour l'instant, on travaille sur le nouveau calque
+    calque2 = newCalque;
     activeCalqueIndex = calques.length - 1;
     updateLayerUI();
 }
 
 function setActiveLayer(index) {
   activeCalqueIndex = index;
-  updateLayerUI(); // Pour changer la couleur du bouton sélectionné
+  updateLayerUI();
 }
 
 function updateLayerUI() {
@@ -147,11 +154,6 @@ function updateLayerUI() {
     for (let i = calques.length - 1; i >= 0; i--) {
         let li = document.createElement('li');
 
-        li.style.padding = '10px';
-        li.style.borderBottom = '1px solid #575757ff';
-        li.style.cursor = 'pointer';
-        li.style.display = 'flex';
-        li.style.justifyContent = 'space-between';
         if (i === activeCalqueIndex) {
         li.style.backgroundColor = '#0c3e69ff';
         } else {
