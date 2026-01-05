@@ -1,27 +1,107 @@
-<div class="canvas-settings-panel">
-  <h2>Canvas Settings</h2>
-  
-  <div class="presets-section">
-    <h3>Presets</h3>
-    <button class="preset-btn" data-width="800" data-height="600">
-      Standard (800x600)
-    </button>
-    <button class="preset-btn" data-width="1920" data-height="1080">
-      HD (1920x1080)
-    </button>
-  </div>
-  
-  <div class="custom-section">
-    <h3>Custom Size</h3>
-    <div class="input-group">
-      <label for="custom-width">Width:</label>
-      <input type="number" id="custom-width" placeholder="800" min="1" />
+<div class="home-container">
+  <!-- HEADER -->
+  <header class="home-header">
+    <div class="header-content">
+      <h1 class="logo">🎨 SketchShop.P5</h1>
+      <p class="tagline">A Powerful p5.js Drawing & Photo Editor</p>
     </div>
-    <div class="input-group">
-      <label for="custom-height">Height:</label>
-      <input type="number" id="custom-height" placeholder="600" min="1" />
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="home-main">
+    <!-- CANVAS SETUP CARD -->
+    <div class="setup-card">
+      <h2 class="card-title">🖼️ Canvas Setup</h2>
+      
+      <div class="presets-section">
+        <h3 class="section-title">Quick Presets</h3>
+        <div class="preset-buttons">
+          <button class="preset-btn" data-width="800" data-height="600">
+            <span class="preset-icon">📱</span>
+            <span class="preset-name">Standard</span>
+            <span class="preset-size">800×600</span>
+          </button>
+          <button class="preset-btn" data-width="1920" data-height="1080">
+            <span class="preset-icon">🖥️</span>
+            <span class="preset-name">HD</span>
+            <span class="preset-size">1920×1080</span>
+          </button>
+          <button class="preset-btn" data-width="1024" data-height="768">
+            <span class="preset-icon">📄</span>
+            <span class="preset-name">Tablet</span>
+            <span class="preset-size">1024×768</span>
+          </button>
+          <button class="preset-btn" data-width="500" data-height="500">
+            <span class="preset-icon">⬜</span>
+            <span class="preset-name">Square</span>
+            <span class="preset-size">500×500</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="custom-section">
+        <h3 class="section-title">Custom Size</h3>
+        <div class="custom-inputs">
+          <div class="input-group">
+            <label for="custom-width">Width (px):</label>
+            <input type="number" id="custom-width" placeholder="800" min="1" class="input-field" />
+          </div>
+          <div class="input-group">
+            <label for="custom-height">Height (px):</label>
+            <input type="number" id="custom-height" placeholder="600" min="1" class="input-field" />
+          </div>
+        </div>
+        <button id="apply-custom" class="btn-primary btn-large">✨ Create Canvas</button>
+      </div>
     </div>
-    <button id="apply-custom">Apply Custom Size</button>
-  </div>
+
+    <!-- FEATURES CARD -->
+    <div class="features-card">
+      <h2 class="card-title">✨ Features</h2>
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="feature-icon">✏️</span>
+          <h4>Drawing Tools</h4>
+          <p>Pencil, Eraser & Shapes</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">📚</span>
+          <h4>Layers System</h4>
+          <p>Organize your artwork</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🎨</span>
+          <h4>Filters</h4>
+          <p>Pixelate, Threshold & ASCII</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">📤</span>
+          <h4>Export & Import</h4>
+          <p>Save your creations</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION CARD -->
+    <div class="nav-card">
+      <h2 class="card-title">🚀 Navigate</h2>
+      <div class="nav-buttons">
+        <button class="nav-btn nav-btn-primary" data-link="/canvas">
+          <span class="nav-icon">🎨</span>
+          <span class="nav-text">
+            <span class="nav-title">Go to Canvas</span>
+            <span class="nav-desc">Start creating your masterpiece</span>
+          </span>
+        </button>
+        <button class="nav-btn nav-btn-secondary" data-link="/export">
+          <span class="nav-icon">📤</span>
+          <span class="nav-text">
+            <span class="nav-title">Export Page</span>
+            <span class="nav-desc">Export and manage files</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </main>
 </div>
 

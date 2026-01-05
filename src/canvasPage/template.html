@@ -1,5 +1,5 @@
-            <div class="canvas-container">
-    <!-- PANNEAU DE CONTRÔLE -->
+<div class="canvas-container">
+    <!-- PANNEAU DE CONTRÔLE (gauche) -->
     <aside class="control-panel">
         <!-- Section Canvas Size -->
         <div class="panel-section">
@@ -56,7 +56,17 @@
         </div>
     </aside>
 
-    <!-- PANNEAU DES CALQUES -->
+    <!-- ZONE CANVAS CENTRALE -->
+    <section class="canvas-stage">
+        <div class="canvas-bar">
+            <span class="canvas-label">Canvas</span>
+            <span class="canvas-size" id="canvas-size-display"></span>
+        </div>
+        <div id="p5-holder" class="canvas-wrapper"></div>
+        <div id="appToModify" class="dynamic-content"></div>
+    </section>
+
+    <!-- PANNEAU DES CALQUES (droite) -->
     <aside class="layers-panel">
         <h3 class="section-title">Layers</h3>
         <div class="calques">
@@ -69,7 +79,4 @@
             </ul>
         </div>
     </aside>
-
-    <!-- ZONE DE CONTENU DYNAMIQUE -->
-    <div id="appToModify" class="dynamic-content"></div>
 </div>
