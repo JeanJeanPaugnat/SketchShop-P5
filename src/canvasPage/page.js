@@ -16,6 +16,13 @@ let baseImage = null;
 let calques = [];
 let activeCalqueIndex = 0;
 
+function updateCanvasSizeDisplay() {
+    const label = document.getElementById('canvas-size-display');
+    if (label) {
+        label.textContent = `${canvasState.width} x ${canvasState.height}px`;
+    }
+}
+
 export function createCanvas(width, height) {
 
     canvasState.width = width;
@@ -29,6 +36,7 @@ export function createCanvas(width, height) {
         inputWidth.value = width;
         inputHeight.value = height;
     }
+    updateCanvasSizeDisplay();
     console.log("Canvas inputs set to: " + width + "x" + height);
 
     if (!pInstance) {
@@ -37,6 +45,10 @@ export function createCanvas(width, height) {
             p.setup = async () => {
                 
                 const canvas = p.createCanvas(width, height);
+                const holder = document.getElementById('p5-holder');
+                if (holder) {
+                    canvas.parent(holder);
+                }
 
                 canvas.drop(handleFileDrop);
 
@@ -53,6 +65,8 @@ export function createCanvas(width, height) {
             p.draw = () => {
 
                 p.background(255);
+                p.fill(200);
+                p.circle(p.mouseX, p.mouseY, 10);
 
                 for (let i = 0; i < calques.length; i++) {
                     let layer = calques[i];
@@ -70,9 +84,11 @@ export function createCanvas(width, height) {
                 }
 
                 if (canvasState.tool === 'square' && canvasState.rectangleStart && p.mouseIsPressed) {
+                    // Aperçu en temps réel (juste le contour, pas de remplissage)
                     p.push();
-                    p.fill(canvasState.color);
-                    p.noStroke();
+                    p.stroke(canvasState.color);
+                    p.strokeWeight(2);
+                    p.noFill();
                     p.rect(
                         canvasState.rectangleStart.x, 
                         canvasState.rectangleStart.y,
@@ -93,14 +109,17 @@ export function createCanvas(width, height) {
 
             p.mouseReleased = () => {
                 if (canvasState.tool === 'square' && canvasState.rectangleStart) {
-                    // Dessiner le rectangle final sur le calque
-                    drawRectangle(
-                        calque2,
+                    // Dessiner le rectangle final REMPLI sur le calque
+                    calques[activeCalqueIndex].graphics.push();
+                    calques[activeCalqueIndex].graphics.fill(canvasState.color);
+                    calques[activeCalqueIndex].graphics.noStroke();
+                    calques[activeCalqueIndex].graphics.rect(
                         canvasState.rectangleStart.x,
                         canvasState.rectangleStart.y,
-                        p.mouseX,
-                        p.mouseY
+                        p.mouseX - canvasState.rectangleStart.x,
+                        p.mouseY - canvasState.rectangleStart.y
                     );
+                    calques[activeCalqueIndex].graphics.pop();
                     console.log("Rectangle dessiné");
                     // Reset
                     canvasState.rectangleStart = null;
@@ -229,6 +248,7 @@ function toggleVisibility(index) {
     if (brushSizeInput) {
         brushSizeInput.addEventListener("input", (e) => {
             canvasState.brushSize = parseInt(e.target.value, 10);
+            document.getElementById("brush-size-value").textContent = e.target.value;
         });
     }
     

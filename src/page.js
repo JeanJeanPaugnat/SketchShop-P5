@@ -35,6 +35,7 @@ function attachEventListeners() {
     let buttonPreset = document.querySelectorAll(".preset-btn");
     buttonPreset.forEach(button => {
         button.addEventListener("click", sizeSelected);
+        console.log(button);
     });
     let applyCustom = document.getElementById("apply-custom");
     let inputWidth = document.getElementById("custom-width");
