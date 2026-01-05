@@ -70,9 +70,11 @@ export function createCanvas(width, height) {
                 }
 
                 if (canvasState.tool === 'square' && canvasState.rectangleStart && p.mouseIsPressed) {
+                    // Aperçu en temps réel (juste le contour, pas de remplissage)
                     p.push();
-                    p.fill(canvasState.color);
-                    p.noStroke();
+                    p.stroke(canvasState.color);
+                    p.strokeWeight(2);
+                    p.noFill();
                     p.rect(
                         canvasState.rectangleStart.x, 
                         canvasState.rectangleStart.y,
@@ -93,14 +95,17 @@ export function createCanvas(width, height) {
 
             p.mouseReleased = () => {
                 if (canvasState.tool === 'square' && canvasState.rectangleStart) {
-                    // Dessiner le rectangle final sur le calque
-                    drawRectangle(
-                        calque2,
+                    // Dessiner le rectangle final REMPLI sur le calque
+                    calques[activeCalqueIndex].graphics.push();
+                    calques[activeCalqueIndex].graphics.fill(canvasState.color);
+                    calques[activeCalqueIndex].graphics.noStroke();
+                    calques[activeCalqueIndex].graphics.rect(
                         canvasState.rectangleStart.x,
                         canvasState.rectangleStart.y,
-                        p.mouseX,
-                        p.mouseY
+                        p.mouseX - canvasState.rectangleStart.x,
+                        p.mouseY - canvasState.rectangleStart.y
                     );
+                    calques[activeCalqueIndex].graphics.pop();
                     console.log("Rectangle dessiné");
                     // Reset
                     canvasState.rectangleStart = null;
