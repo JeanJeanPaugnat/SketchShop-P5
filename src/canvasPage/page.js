@@ -234,6 +234,7 @@ function toggleVisibility(index) {
     if (brushSizeInput) {
         brushSizeInput.addEventListener("input", (e) => {
             canvasState.brushSize = parseInt(e.target.value, 10);
+            document.getElementById("brush-size-value").textContent = e.target.value;
         });
     }
     

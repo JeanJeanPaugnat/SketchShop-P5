@@ -1,32 +1,75 @@
-    <div id="app"></div>
-            <div class="test">
-                <div>
-                    <input type="number" id="custom-width"  min="1" />
-                    <input type="number" id="custom-height"  min="1" />
-                </div>
-      <button id="clear">Clear</button>
-      <button id="pencil">Pencil</button>
-      <button id="eraser">Eraser</button>
-      <input type="range" name="brush" id="brush-size" min="1" max="50" value="5" />
-      <input type="color" name="colorPicker" id="colorPicker">
-      <button id="shape-square">Square</button>
-      <button class="filter-threshold">Threshold</button>
-      <button class="filter-pixelate">Pixelate</button>
-      <button class="filter-ascii">ASCII</button>
-      <!-- <select name="colorChange" id="colorChange" class="color">
-        <option value="red">red</option>
-        <option value="yellow">yellow</option>
-      </select> -->
-      <button id="upload">Upload</button>
-      <button id="export">Export</button>
-    </div>
-    <div class="calques">
-      <input type="text" id="layer-name" placeholder="Layer Name"/>
-      <button id="new-layer">New Layer</button>
-      <ul class="layers">
-        <!-- Layers will be added here -->
-      </ul>
-    </div>
-    <div id="appToModify">
+            <div class="canvas-container">
+    <!-- PANNEAU DE CONTRÔLE -->
+    <aside class="control-panel">
+        <!-- Section Canvas Size -->
+        <div class="panel-section">
+            <h3 class="section-title">Canvas Size</h3>
+            <div class="input-group">
+                <label for="custom-width">Width:</label>
+                <input type="number" id="custom-width" min="1" class="input-field" />
+            </div>
+            <div class="input-group">
+                <label for="custom-height">Height:</label>
+                <input type="number" id="custom-height" min="1" class="input-field" />
+            </div>
+        </div>
 
-    </div>
+        <!-- Section Outils de Dessin -->
+        <div class="panel-section">
+            <h3 class="section-title">Drawing Tools</h3>
+            <div class="button-group">
+                <button id="pencil" class="tool-btn" title="Crayon">✏️ Pencil</button>
+                <button id="eraser" class="tool-btn" title="Gomme">🧹 Eraser</button>
+                <button id="shape-square" class="tool-btn" title="Carré">⬜ Square</button>
+            </div>
+            <div class="input-group">
+                <label for="brush-size">Brush Size:</label>
+                <div class="slider-wrapper">
+                    <input type="range" id="brush-size" min="1" max="50" value="5" class="slider" />
+                    <span id="brush-size-value">5</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="colorPicker">Color:</label>
+                <input type="color" id="colorPicker" class="color-picker" />
+            </div>
+            <button id="clear" class="btn-danger">🗑️ Clear</button>
+        </div>
+
+        <!-- Section Filtres -->
+        <div class="panel-section">
+            <h3 class="section-title">Filters</h3>
+            <div class="button-group">
+                <button class="filter-threshold btn-filter">🎨 Threshold</button>
+                <button class="filter-pixelate btn-filter">📦 Pixelate</button>
+                <button class="filter-ascii btn-filter">📝 ASCII</button>
+            </div>
+        </div>
+
+        <!-- Section Fichiers -->
+        <div class="panel-section">
+            <h3 class="section-title">File</h3>
+            <div class="button-group">
+                <button id="upload" class="btn-file">📤 Upload</button>
+                <button id="export" class="btn-file">📥 Export</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- PANNEAU DES CALQUES -->
+    <aside class="layers-panel">
+        <h3 class="section-title">Layers</h3>
+        <div class="calques">
+            <div class="layer-input-group">
+                <input type="text" id="layer-name" placeholder="Layer name" class="input-field" />
+                <button id="new-layer" class="btn-primary" title="Ajouter un calque">+</button>
+            </div>
+            <ul class="layers">
+                <!-- Layers will be added here -->
+            </ul>
+        </div>
+    </aside>
+
+    <!-- ZONE DE CONTENU DYNAMIQUE -->
+    <div id="appToModify" class="dynamic-content"></div>
+</div>
