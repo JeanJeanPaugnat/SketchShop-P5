@@ -313,7 +313,7 @@ function toggleVisibility(index) {
             let pixelSizeInput = document.getElementById("pixelSizeInput");
             applyPixelateBtn.addEventListener("click", () => {
                 let pixelSize = parseInt(pixelSizeInput.value, 10);
-                applyPixelateFilter(calque2, pixelSize);
+                applyPixelateFilter(calques[activeCalqueIndex].graphics, pixelSize);
             });
         });
 
@@ -323,7 +323,7 @@ function toggleVisibility(index) {
     if (filterThresholdBtn) {
         filterThresholdBtn.addEventListener("click", () => {
             // Appliquer le filtre de seuil ici
-            applyThresholdFilter(calque2, 128);
+            applyThresholdFilter(calques[activeCalqueIndex].graphics, 128);
             console.log("Filtre de seuil appliqué");
         });
     }
@@ -331,8 +331,7 @@ function toggleVisibility(index) {
     const asciiBtn = document.querySelector(".filter-ascii");
     if (asciiBtn) {
         asciiBtn.addEventListener("click", () => {
-            // Appliquer le filtre ASCII ici
-            applyAsciiFilter(calque2, 10);
+            applyAsciiFilter(calques[activeCalqueIndex].graphics, 10);
         });
     }
 
