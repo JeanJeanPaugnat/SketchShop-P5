@@ -52,10 +52,8 @@ export function createCanvas(width, height) {
 
                 canvas.drop(handleFileDrop);
 
-                addNewLayer('calque1'); // Ajouter un calque initial
-                
-                calques[0].graphics.background(0); // Fond blanc pour le calque de base
-                // Activer la lecture fréquente des pixels pour les filtres
+                addNewLayer('Calque 1');
+
                 if (calques[0].graphics.canvas) {
                     const ctx = calques[0].graphics.canvas.getContext('2d');
                     if (ctx) ctx.willReadFrequently = true;
@@ -64,7 +62,7 @@ export function createCanvas(width, height) {
 
             p.draw = () => {
 
-                p.background(255);
+                p.clear();
                 p.fill(200);
                 p.circle(p.mouseX, p.mouseY, 10);
 
