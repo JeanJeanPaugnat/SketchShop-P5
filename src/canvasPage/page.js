@@ -262,7 +262,7 @@ function toggleVisibility(index) {
     const clearBtn = document.getElementById("clear");
     if (clearBtn) {
         clearBtn.addEventListener("click", () => {
-            clearCanvas(calque2); 
+            clearCanvas(calques[activeCalqueIndex].graphics); 
         });
     }
 
