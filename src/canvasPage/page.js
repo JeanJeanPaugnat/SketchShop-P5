@@ -52,10 +52,8 @@ export function createCanvas(width, height) {
 
                 canvas.drop(handleFileDrop);
 
-                addNewLayer('calque1'); // Ajouter un calque initial
-                
-                calques[0].graphics.background(0); // Fond blanc pour le calque de base
-                // Activer la lecture fréquente des pixels pour les filtres
+                addNewLayer('Calque 1');
+
                 if (calques[0].graphics.canvas) {
                     const ctx = calques[0].graphics.canvas.getContext('2d');
                     if (ctx) ctx.willReadFrequently = true;
@@ -64,7 +62,7 @@ export function createCanvas(width, height) {
 
             p.draw = () => {
 
-                p.background(255);
+                p.clear();
                 p.fill(200);
                 p.circle(p.mouseX, p.mouseY, 10);
 
@@ -181,6 +179,7 @@ function updateLayerUI() {
 
         li.addEventListener('click', () => setActiveLayer(i));
         let spanName = document.createElement('span');
+        li.setAttribute('draggable', 'true');
         spanName.textContent = calques[i].name;
         // Bouton Toggle Visibilité (petit bonus)
         let btnEye = document.createElement('button');
@@ -196,6 +195,17 @@ function updateLayerUI() {
 
     }
 }
+
+
+
+// function changeOrderLayer(index, direction) {
+//   let newIndex = index + direction;
+//   if (newIndex < 0 || newIndex >= calques.length) return; // Hors limites
+//     let temp = calques[index];
+//     calques[index] = calques[newIndex];
+//     calques[newIndex] = temp;
+//     updateLayerUI();
+// }
 
 
 
@@ -234,6 +244,36 @@ function toggleVisibility(index) {
             eraserBtn.style.backgroundColor = 'yellow';
         });
     }
+
+    // draggable layers
+    let draggedItem = null;
+    const layerList = document.querySelector('.layers');
+
+    layerList.addEventListener('dragstart', (e) => {
+        console.log("Drag start:", e.target);
+        draggedItem = e.target;
+        e.target.style.opacity = 0.5;
+    });
+    layerList.addEventListener('dragend', (e) => {
+        e.target.style.opacity = '';
+        draggedItem = null;
+    });
+    layerList.addEventListener('dragover', (e) => {
+        e.preventDefault();
+    });
+    layerList.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (e.target.tagName === 'LI' && draggedItem) {
+            const nodes = Array.from(layerList.children);
+            const draggedIndex = nodes.indexOf(draggedItem);
+            const targetIndex = nodes.indexOf(e.target);
+            // Réorganiser les calques dans l'état
+            const [movedLayer] = calques.splice(draggedIndex, 1);
+            calques.splice(targetIndex, 0, movedLayer);
+            updateLayerUI();
+        }
+    });
+
     
     // // Bouton SQUARE
     // const squareBtn = document.getElementById("square");
@@ -264,7 +304,7 @@ function toggleVisibility(index) {
     const clearBtn = document.getElementById("clear");
     if (clearBtn) {
         clearBtn.addEventListener("click", () => {
-            clearCanvas(calque2); 
+            clearCanvas(calques[activeCalqueIndex].graphics); 
         });
     }
 
@@ -313,7 +353,7 @@ function toggleVisibility(index) {
             let pixelSizeInput = document.getElementById("pixelSizeInput");
             applyPixelateBtn.addEventListener("click", () => {
                 let pixelSize = parseInt(pixelSizeInput.value, 10);
-                applyPixelateFilter(calque2, pixelSize);
+                applyPixelateFilter(calques[activeCalqueIndex].graphics, pixelSize);
             });
         });
 
@@ -323,7 +363,7 @@ function toggleVisibility(index) {
     if (filterThresholdBtn) {
         filterThresholdBtn.addEventListener("click", () => {
             // Appliquer le filtre de seuil ici
-            applyThresholdFilter(calque2, 128);
+            applyThresholdFilter(calques[activeCalqueIndex].graphics, 128);
             console.log("Filtre de seuil appliqué");
         });
     }
@@ -331,8 +371,7 @@ function toggleVisibility(index) {
     const asciiBtn = document.querySelector(".filter-ascii");
     if (asciiBtn) {
         asciiBtn.addEventListener("click", () => {
-            // Appliquer le filtre ASCII ici
-            applyAsciiFilter(calque2, 10);
+            applyAsciiFilter(calques[activeCalqueIndex].graphics, 10);
         });
     }
 
