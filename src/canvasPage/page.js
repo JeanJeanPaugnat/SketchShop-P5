@@ -179,6 +179,7 @@ function updateLayerUI() {
 
         li.addEventListener('click', () => setActiveLayer(i));
         let spanName = document.createElement('span');
+        li.setAttribute('draggable', 'true');
         spanName.textContent = calques[i].name;
         // Bouton Toggle Visibilité (petit bonus)
         let btnEye = document.createElement('button');
@@ -194,6 +195,17 @@ function updateLayerUI() {
 
     }
 }
+
+
+
+// function changeOrderLayer(index, direction) {
+//   let newIndex = index + direction;
+//   if (newIndex < 0 || newIndex >= calques.length) return; // Hors limites
+//     let temp = calques[index];
+//     calques[index] = calques[newIndex];
+//     calques[newIndex] = temp;
+//     updateLayerUI();
+// }
 
 
 
@@ -232,6 +244,36 @@ function toggleVisibility(index) {
             eraserBtn.style.backgroundColor = 'yellow';
         });
     }
+
+    // draggable layers
+    let draggedItem = null;
+    const layerList = document.querySelector('.layers');
+
+    layerList.addEventListener('dragstart', (e) => {
+        console.log("Drag start:", e.target);
+        draggedItem = e.target;
+        e.target.style.opacity = 0.5;
+    });
+    layerList.addEventListener('dragend', (e) => {
+        e.target.style.opacity = '';
+        draggedItem = null;
+    });
+    layerList.addEventListener('dragover', (e) => {
+        e.preventDefault();
+    });
+    layerList.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (e.target.tagName === 'LI' && draggedItem) {
+            const nodes = Array.from(layerList.children);
+            const draggedIndex = nodes.indexOf(draggedItem);
+            const targetIndex = nodes.indexOf(e.target);
+            // Réorganiser les calques dans l'état
+            const [movedLayer] = calques.splice(draggedIndex, 1);
+            calques.splice(targetIndex, 0, movedLayer);
+            updateLayerUI();
+        }
+    });
+
     
     // // Bouton SQUARE
     // const squareBtn = document.getElementById("square");
