@@ -1,37 +1,43 @@
 import { canvasState } from './canvasState.js';
 
-// Variables globales pour stocker la vitesse lissée
-let lastSmoothedSpeed = 0;
+// Variables globales pour stocker l'historique des vitesses pour lissage avancé
+let speedHistory = [];
+const SPEED_HISTORY_SIZE = 5; // Garder les 5 derniers calculs de vitesse
 
-// Calcule la vitesse de la souris et retourne un strokeWeight adapté avec transition fluide
+// Calcule la vitesse de la souris et retourne un strokeWeight adapté avec transition ultra-fluide
 function calculateDynamicStrokeWeight(mouseX, mouseY, pmouseX, pmouseY) {
     // Calculer la distance parcourue (vitesse)
     const dx = mouseX - pmouseX;
     const dy = mouseY - pmouseY;
     const speed = Math.sqrt(dx * dx + dy * dy);
     
-    // Lissage exponentiel pour une transition douce
-    // Plus la valeur de smoothing est proche de 1, plus la transition est lisse
-    const smoothing = 0.3;
-    lastSmoothedSpeed = lastSmoothedSpeed * (1 - smoothing) + speed * smoothing;
+    // Ajouter à l'historique de vitesse
+    speedHistory.push(speed);
+    if (speedHistory.length > SPEED_HISTORY_SIZE) {
+        speedHistory.shift();
+    }
     
-    // Mapper la vitesse lissée à un strokeWeight
-    // Vitesse lente (faible distance) = trait épais
-    // Vitesse rapide (grande distance) = trait fin
+    // Calculer la moyenne mobile pour un lissage ultra-progressif
+    const averageSpeed = speedHistory.reduce((a, b) => a + b, 0) / speedHistory.length;
     
-    // Augmenter maxSpeed pour une transition plus progressive
-    const maxSpeed = 50;
-    const normalizedSpeed = Math.min(lastSmoothedSpeed, maxSpeed) / maxSpeed;
+    // Plage de vitesse augmentée pour une transition très progressive
+    const maxSpeed = 80;
+    const normalizedSpeed = Math.min(averageSpeed, maxSpeed) / maxSpeed;
     
-    // Utiliser une courbe ease-in-out pour une transition plus naturelle
-    // Au lieu d'une transition linéaire
-    const easedSpeed = normalizedSpeed * normalizedSpeed * (3 - 2 * normalizedSpeed);
+    // Courbe d'easing plus douce (cubic ease-in-out)
+    let easedSpeed;
+    if (normalizedSpeed < 0.5) {
+        easedSpeed = 4 * normalizedSpeed * normalizedSpeed * normalizedSpeed;
+    } else {
+        const x = 2 * normalizedSpeed - 2;
+        easedSpeed = 0.5 * x * x * x + 1;
+    }
     
     // Utiliser des pourcentages de la brush size actuelle
-    // À vitesse rapide, le trait devient 35% de la taille de la brush
+    // À vitesse rapide, le trait devient 30% de la taille de la brush
     // À vitesse lente, c'est 100% de la taille de la brush
     const maxWeight = canvasState.brushSize;
-    const minWeight = canvasState.brushSize * 0.35; // 35% de la brush size
+    const minWeight = canvasState.brushSize * 0.30; // 30% de la brush size
     const dynamicWeight = maxWeight - (easedSpeed * (maxWeight - minWeight));
     
     return Math.max(minWeight, dynamicWeight);
