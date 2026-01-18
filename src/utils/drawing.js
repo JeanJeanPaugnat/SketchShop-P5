@@ -1,24 +1,36 @@
 import { canvasState } from './canvasState.js';
 
-// Calcule la vitesse de la souris et retourne un strokeWeight adapté
+// Variables globales pour stocker la vitesse lissée
+let lastSmoothedSpeed = 0;
+
+// Calcule la vitesse de la souris et retourne un strokeWeight adapté avec transition fluide
 function calculateDynamicStrokeWeight(mouseX, mouseY, pmouseX, pmouseY) {
     // Calculer la distance parcourue (vitesse)
     const dx = mouseX - pmouseX;
     const dy = mouseY - pmouseY;
     const speed = Math.sqrt(dx * dx + dy * dy);
     
-    // Mapper la vitesse à un strokeWeight
+    // Lissage exponentiel pour une transition douce
+    // Plus la valeur de smoothing est proche de 1, plus la transition est lisse
+    const smoothing = 0.3;
+    lastSmoothedSpeed = lastSmoothedSpeed * (1 - smoothing) + speed * smoothing;
+    
+    // Mapper la vitesse lissée à un strokeWeight
     // Vitesse lente (faible distance) = trait épais
     // Vitesse rapide (grande distance) = trait fin
     
-    // Limiter la vitesse entre 0 et une valeur max
-    const maxSpeed = 30;
-    const normalizedSpeed = Math.min(speed, maxSpeed) / maxSpeed;
+    // Augmenter maxSpeed pour une transition plus progressive
+    const maxSpeed = 50;
+    const normalizedSpeed = Math.min(lastSmoothedSpeed, maxSpeed) / maxSpeed;
+    
+    // Utiliser une courbe ease-in-out pour une transition plus naturelle
+    // Au lieu d'une transition linéaire
+    const easedSpeed = normalizedSpeed * normalizedSpeed * (3 - 2 * normalizedSpeed);
     
     // Inverser: faible vitesse = gros weight, vitesse rapide = petit weight
     const minWeight = 1;
     const maxWeight = canvasState.brushSize;
-    const dynamicWeight = maxWeight - (normalizedSpeed * (maxWeight - minWeight));
+    const dynamicWeight = maxWeight - (easedSpeed * (maxWeight - minWeight));
     
     return Math.max(minWeight, dynamicWeight);
 }
