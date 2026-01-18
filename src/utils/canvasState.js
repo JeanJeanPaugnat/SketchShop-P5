@@ -5,7 +5,8 @@ export const canvasState = {
     height: 600,
     brushSize: 5,
     isDrawing: true,
-    rectangleStart: null, 
+    rectangleStart: null,
+    dynamicBrush: false,
 };
 
 export function setColor(color) { 
@@ -13,4 +14,8 @@ export function setColor(color) {
 }
 export function setTool(tool) { 
     canvasState.tool = tool; 
+}
+
+export function toggleDynamicBrush() {
+    canvasState.dynamicBrush = !canvasState.dynamicBrush;
 }

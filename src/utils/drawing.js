@@ -27,9 +27,12 @@ function calculateDynamicStrokeWeight(mouseX, mouseY, pmouseX, pmouseY) {
 export function drawPencil(graphics, mouseX, mouseY, pmouseX, pmouseY) {
     graphics.stroke(canvasState.color);
     
-    // Utiliser l'épaisseur dynamique basée sur la vitesse
-    const dynamicWeight = calculateDynamicStrokeWeight(mouseX, mouseY, pmouseX, pmouseY);
-    graphics.strokeWeight(dynamicWeight);
+    // Utiliser l'épaisseur dynamique seulement si activée
+    let strokeW = canvasState.brushSize;
+    if (canvasState.dynamicBrush) {
+        strokeW = calculateDynamicStrokeWeight(mouseX, mouseY, pmouseX, pmouseY);
+    }
+    graphics.strokeWeight(strokeW);
     
     graphics.line(mouseX, mouseY, pmouseX, pmouseY);
 }
