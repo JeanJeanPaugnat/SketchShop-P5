@@ -27,9 +27,11 @@ function calculateDynamicStrokeWeight(mouseX, mouseY, pmouseX, pmouseY) {
     // Au lieu d'une transition linéaire
     const easedSpeed = normalizedSpeed * normalizedSpeed * (3 - 2 * normalizedSpeed);
     
-    // Inverser: faible vitesse = gros weight, vitesse rapide = petit weight
-    const minWeight = 1;
+    // Utiliser des pourcentages de la brush size actuelle
+    // À vitesse rapide, le trait devient 35% de la taille de la brush
+    // À vitesse lente, c'est 100% de la taille de la brush
     const maxWeight = canvasState.brushSize;
+    const minWeight = canvasState.brushSize * 0.35; // 35% de la brush size
     const dynamicWeight = maxWeight - (easedSpeed * (maxWeight - minWeight));
     
     return Math.max(minWeight, dynamicWeight);
