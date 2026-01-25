@@ -1,4 +1,4 @@
-import template from './template.html?raw';
+import template from './import.html?raw';
 import './style.css';
 
 

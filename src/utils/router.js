@@ -16,7 +16,7 @@ const routes = {
     render: async () => {
       const app = document.getElementById('app');
       // Charger le template HTML
-      const templateResponse = await fetch('/src/canvasPage/template.html');
+      const templateResponse = await fetch('/src/canvasPage/canvas.html');
       const templateHTML = await templateResponse.text();
       app.innerHTML = templateHTML;
       
@@ -41,7 +41,7 @@ const routes = {
     render: async () => {
       const app = document.getElementById('app');
       // Charger le template HTML
-      const templateResponse = await fetch('/src/exportPage/template.html');
+      const templateResponse = await fetch('/src/exportPage/export.html');
       const templateHTML = await templateResponse.text();
       app.innerHTML = templateHTML;
       
