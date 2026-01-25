@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { canvasState, setColor, setTool } from '../utils/canvasState.js';
+import { canvasState, setColor, setTool, toggleDynamicBrush } from '../utils/canvasState.js';
 import { drawPencil, erasePencil, drawRectangle, clearCanvas } from '../utils/drawing.js';
 import { applyThresholdFilter, applyPixelateFilter, applyAsciiFilter } from '../utils/filters.js'
 
@@ -242,6 +242,16 @@ function toggleVisibility(index) {
         eraserBtn.addEventListener("click", () => {
             setTool('eraser');
             eraserBtn.style.backgroundColor = 'yellow';
+        });
+    }
+
+    // Bouton Dynamic Brush
+    const dynamicBrushBtn = document.getElementById("dynamic-brush");
+    if (dynamicBrushBtn) {
+        dynamicBrushBtn.addEventListener("click", () => {
+            toggleDynamicBrush();
+            // Changement visuel pour montrer l'état activé/désactivé
+            dynamicBrushBtn.style.backgroundColor = canvasState.dynamicBrush ? 'yellow' : '';
         });
     }
 
