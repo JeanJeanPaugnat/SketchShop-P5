@@ -2,6 +2,7 @@ import p5 from "p5";
 import { canvasState, setColor, setTool, toggleDynamicBrush } from '../utils/canvasState.js';
 import { drawPencil, erasePencil, drawRectangle, clearCanvas } from '../utils/drawing.js';
 import { applyThresholdFilter, applyPixelateFilter, applyAsciiFilter } from '../utils/filters.js'
+import './style.css';
 
 import { C as exportP } from '../exportPage/export.js';
 import { C as uploadP } from '../UploadPage/import.js';
@@ -127,6 +128,7 @@ export function createCanvas(width, height) {
     }
     // Attacher les écouteurs des BOUTONS
     attachButtonListeners(pInstance);
+    window.__P5_INSTANCE__ = pInstance;
 }
 
 // Gestion du drop p5 (fichier image)

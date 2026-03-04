@@ -1,15 +1,17 @@
 import { navigateTo } from './utils/router.js';
 
-// État global pour la taille du canvas
-window.canvasSize = {
-    width: 800,
-    height: 600
-};
+if (!window.canvasSize) {
+    window.canvasSize = {
+        width: 800,
+        height: 600
+    };
+}
 
 function sizeSelected(ev) {
-    console.log("Preset size selected: " + ev.target.dataset.width + "x" + ev.target.dataset.height);
-    let width = parseInt(ev.target.dataset.width);
-    let height = parseInt(ev.target.dataset.height);
+    const target = ev.currentTarget;
+    console.log("Preset size selected: " + target.dataset.width + "x" + target.dataset.height);
+    let width = parseInt(target.dataset.width, 10);
+    let height = parseInt(target.dataset.height, 10);
     
     // Stocker la taille sélectionnée
     window.canvasSize.width = width;
@@ -56,6 +58,8 @@ function attachEventListeners() {
     }
 }
 
-attachEventListeners();
+export function initHomePage() {
+    attachEventListeners();
+}
 
 
