@@ -11,7 +11,7 @@ export default function Navbar() {
   const [activeTab, setActiveTab] = useState<(typeof NAV_ITEMS)[number]>("FILE")
 
   return (
-    <nav className="border-b border-white/10 bg-[#0b0b0b] px-6 py-2.5">
+    <nav className="border-b border-white/10 bg-[#0b0b0b] px-6 py-5">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <div className="flex items-center gap-8">
           <a href="/">
