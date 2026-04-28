@@ -1,6 +1,9 @@
 import React from 'react';
 import { P5Canvas } from '@p5-wrapper/react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import ToolBox from './ToolBox';
+
+type Tool = 'select' | 'move' | 'brush' | 'shapes';
 
 const sketch = (p5: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   p5.setup = () => {
@@ -18,23 +21,30 @@ const sketch = (p5: any) => { // eslint-disable-line @typescript-eslint/no-expli
 };
 
 const Canvas: React.FC = () => {
+  const handleToolChange = (tool: Tool) => {
+    console.log('Tool changed to:', tool);
+  };
+
   return (
-    <TransformWrapper
-      limitToBounds={false}
-      minScale={0.1}
-      maxScale={5}
-      initialScale={1}
-    >
-      <TransformComponent
-        wrapperStyle={{ width: '100%', height: '100vh' }}
+    <div className="relative w-full h-screen bg-gray-100">
+      <TransformWrapper
+        limitToBounds={false}
+        minScale={0.1}
+        maxScale={5}
+        initialScale={1}
       >
-        <div style={{ width: '2000px', height: '2000px', background: '#f5f5f5', position: 'relative' }}>
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            <P5Canvas sketch={sketch} />
+        <TransformComponent
+          wrapperStyle={{ width: '100%', height: '100vh' }}
+        >
+          <div style={{ width: '2000px', height: '2000px', background: '#f5f5f5', position: 'relative' }}>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+              <P5Canvas sketch={sketch} />
+            </div>
           </div>
-        </div>
-      </TransformComponent>
-    </TransformWrapper>
+        </TransformComponent>
+      </TransformWrapper>
+      <ToolBox onToolChange={handleToolChange} />
+    </div>
   );
 };
 
