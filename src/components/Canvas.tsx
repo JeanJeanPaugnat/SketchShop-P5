@@ -43,7 +43,7 @@ const Canvas: React.FC = () => {
           </div>
         </TransformComponent>
       </TransformWrapper>
-      <ToolBox onToolChange={handleToolChange} />
+      <ToolBox />
     </div>
   );
 };
