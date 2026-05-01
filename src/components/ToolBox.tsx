@@ -11,7 +11,7 @@ export default function ToolBox(){
 
 
   return (
-    <div className="flex flex-col  py-4 gap-4 absolute top-4 bottom-4 left-4 bg-[#171717]">
+    <div className="flex flex-col  py-2 gap-4 absolute h-full top-0 left-4 bg-[#171717]">
       <div className="flex flex-col gap-2 px-2">
         <button className=" flex items-center justify-center w-12 h-12 hover:bg-[#8354E0] text-[#737373] hover:text-white">
           <CursorMinimal width={20} className=" hover:text-white" />
