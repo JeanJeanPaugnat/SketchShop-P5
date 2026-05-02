@@ -1,14 +1,14 @@
 import Navbar from "../components/Navbar"
 import Canvas from "../components/Canvas"
-import {Example} from "../components/PinZoomPinch"
+import PinZoomPinch from "../components/PinZoomPinch"
 
 export default function Workshop() {
   return (
-    <>
+    <div className="flex flex-col h-dvh">
       <Navbar />
-      <Example />
+      <PinZoomPinch />
 
       {/* <Canvas /> */}
-    </>
+    </div>
   )
 }
