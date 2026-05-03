@@ -21,30 +21,10 @@ const sketch = (p5: any) => { // eslint-disable-line @typescript-eslint/no-expli
 };
 
 const Canvas: React.FC = () => {
-  const handleToolChange = (tool: Tool) => {
-    console.log('Tool changed to:', tool);
-  };
 
   return (
-    <div className="relative w-full h-screen bg-gray-100">
-      <TransformWrapper
-        limitToBounds={false}
-        minScale={0.1}
-        maxScale={5}
-        initialScale={1}
-      >
-        <TransformComponent
-          wrapperStyle={{ width: '100%', height: '100vh' }}
-        >
-          <div style={{ width: '2000px', height: '2000px', background: '#f5f5f5', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-              <P5Canvas sketch={sketch} />
-            </div>
-          </div>
-        </TransformComponent>
-      </TransformWrapper>
-      <ToolBox />
-    </div>
+    <P5Canvas sketch={sketch} />
+
   );
 };
 
