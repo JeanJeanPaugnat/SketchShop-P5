@@ -6,7 +6,7 @@ import ToolBox from "./ToolBox";
 
 export default function PinZoomPinch () {
   return (
-    <div className="flex-1 bg-gray-100 overflow-hidden">
+    <div className="flex-1 flex bg-gray-100 overflow-hidden">
           <TransformWrapper
             initialScale={0.45}
             minScale={0.1}
