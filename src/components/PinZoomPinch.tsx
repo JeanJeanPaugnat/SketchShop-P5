@@ -1,7 +1,8 @@
 import React from "react";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-
+import Canvas from "./Canvas";
+import ToolBox from "./ToolBox";
 
 export default function PinZoomPinch () {
   return (
@@ -12,13 +13,13 @@ export default function PinZoomPinch () {
             maxScale={4}
             limitToBounds={false}
             wheel={{
-              activationKeys: (keys) =>
-                ["Meta", "Ctrl"].some((key) => keys.includes(key)),
+
+              activationKeys: ["Control"],
+              step: 0.01,
             }}
             trackPadPanning={{
               disabled: false,
-              activationKeys: (keys) =>
-                !["Meta", "Ctrl"].some((key) => keys.includes(key)),
+              activationKeys: ["Control"],
             }}
             
           >
@@ -27,9 +28,11 @@ export default function PinZoomPinch () {
               contentClass="h-full w-full"
               infinite
             >
-              <img className="" src="./Jean.jpg" alt="" />
+                <img src="./Jean.jpg" alt="" />
+              {/* <Canvas /> */}
             </TransformComponent>
           </TransformWrapper>
+            <ToolBox />
     </div>
   );
   
