@@ -27,11 +27,11 @@ export default function PinZoomPinch () {
             
           >
             <TransformComponent
-              wrapperClass="w-full h-full rounded-none border-none overflow-hidden "
-              contentClass="h-full w-full "
+              wrapperClass="!w-full !h-full !max-w-none !max-h-none rounded-none border-none overflow-hidden "
+              contentClass="!w-full !h-full "
               infinite
             >
-                <Canvas />
+                <Canvas activeTool={activeTool}/>
             </TransformComponent>
           </TransformWrapper>
           <ToolBox activeTool={activeTool} setActiveTool={setActiveTool} />
@@ -39,3 +39,36 @@ export default function PinZoomPinch () {
   );
   
 };
+
+
+
+// import React, { useState } from "react";
+// import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+// import { Canvas } from "./Canvas";
+// import ToolBox from "./ToolBox";
+// import type { Tool } from "../types";
+
+// export default function PinZoomPinch () {
+//   const [activeTool, setActiveTool] = useState<Tool>('brush');
+
+//   return (
+//     <div className="flex-1 relative bg-gray-100 overflow-hidden w-full h-full">
+//           <TransformWrapper
+//             initialScale={1}
+//             minScale={1}
+//             maxScale={1}
+//             disabled={true}
+//           >
+//             <TransformComponent
+//               wrapperClass="!w-full !h-full !max-w-none !max-h-none flex items-center justify-center"
+//               contentClass="!w-full !h-full flex items-center justify-center"
+//             >
+//                 <Canvas />
+//             </TransformComponent>
+//           </TransformWrapper>
+//           <ToolBox activeTool={activeTool} setActiveTool={setActiveTool} />
+//     </div>
+//   );
+  
+// };
+

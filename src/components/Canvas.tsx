@@ -1,22 +1,54 @@
 import * as React from "react";
 import { P5Canvas } from "@p5-wrapper/react";
 import type { Sketch } from "@p5-wrapper/react";
+import type { Tool } from '../types';
 
-const sketch: Sketch = p5 => {
-  p5.setup = () => p5.createCanvas(600, 400, p5.WEBGL);
+interface CanvasProps {
+  activeTool: Tool;
+  [key: string]: unknown;
+}
 
-  p5.draw = () => {
-    p5.background(250);
-    p5.normalMaterial();
-    p5.push();
-    p5.rotateZ(p5.frameCount * 0.01);
-    p5.rotateX(p5.frameCount * 0.01);
-    p5.rotateY(p5.frameCount * 0.01);
-    p5.plane(100);
-    p5.pop();
+
+const sketch: Sketch<CanvasProps> = (p5) => {
+  let activeTool: Tool = 'brush';
+
+  p5.updateWithProps = (props) => {
+    activeTool = props.activeTool;
+  };
+
+  p5.setup = () => {
+    p5.createCanvas(1200, 800, p5.WEBGL);
+    p5.background(255);
+  };
+
+p5.draw = () => {
+    if (activeTool === 'brush') {
+      p5.cursor(p5.CROSS);
+    } else if (activeTool === 'move') {
+      p5.cursor(p5.HAND);
+    } else if (activeTool === 'select') {
+      p5.cursor(p5.ARROW);
+    } else {
+      p5.cursor(p5.CROSS);
+    }
+
+    if (p5.mouseIsPressed) {
+      if (activeTool === 'brush') {
+        p5.stroke(0);
+        p5.strokeWeight(4);
+        p5.line(p5.pmouseX, p5.pmouseY, p5.mouseX, p5.mouseY);
+      }
+      
+      if (activeTool === 'shapes') {
+        p5.noStroke();
+        p5.fill(131, 84, 224, 50); // Semi-transparent purple
+        p5.ellipse(p5.mouseX, p5.mouseY, 20, 20);
+      }
+    }
   };
 };
 
-export function Canvas() {
-  return <P5Canvas sketch={sketch} />;
+export function Canvas({ activeTool }: CanvasProps) {
+  return <P5Canvas sketch={sketch} activeTool={activeTool} />;
 }
+

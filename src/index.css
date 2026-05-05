@@ -12,4 +12,9 @@ body {
     height: -webkit-fill-available;
     height: fill-available;
   }
+
+  .w-fill-available {
+    width: -webkit-fill-available;
+    width: fill-available;
+  }
 }
