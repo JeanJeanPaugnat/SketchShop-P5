@@ -1,16 +1,16 @@
+import { useState } from "react";
 import LayerCard from "./ui/LayerCard";
 
-
 export default function SideBarLayer() {
-const layers = [
+  const [layers, setLayers] = useState([
     {
       id: 1,
       title: "Portrait Main",
       subtitle: "Standard Layer",
       isActive: true,
       isVisible: true,
-      isLocked: true,
-      thumbnail: null // Ajoute tes URLs ici
+      isLocked: false,
+      thumbnail: null,
     },
     {
       id: 2,
@@ -19,7 +19,7 @@ const layers = [
       isActive: false,
       isVisible: true,
       isLocked: true,
-      thumbnail: null
+      thumbnail: null,
     },
     {
       id: 3,
@@ -27,21 +27,39 @@ const layers = [
       subtitle: "Background",
       isActive: false,
       isVisible: false,
-      isLocked: true,
-      thumbnail: null
-    }
-  ];
+      isLocked: false,
+      thumbnail: null,
+    },
+  ]);
 
-    return (
-    <aside className="flex flex-col right-0  gap-4 absolute h-fill-available m-6 bg-[#171717] z-10">
+  const toggleVisibility = (id: number) => {
+    setLayers(layers.map(l => l.id === id ? { ...l, isVisible: !l.isVisible } : l));
+  };
+
+  const toggleLock = (id: number) => {
+    setLayers(layers.map(l => l.id === id ? { ...l, isLocked: !l.isLocked } : l));
+  };
+
+  const setActive = (id: number) => {
+    setLayers(layers.map(l => ({ ...l, isActive: l.id === id })));
+  };
+
+  return (
+    <aside className="flex flex-col right-0 gap-4 absolute h-fill-available m-6 bg-[#171717] z-10">
       <div className="flex flex-col py-2 px-2 gap-1">
         {layers.map((layer) => (
-          <LayerCard key={layer.id} {...layer} />
+          <LayerCard
+            key={layer.id}
+            {...layer}
+            onToggleVisibility={() => toggleVisibility(layer.id)}
+            onToggleLock={() => toggleLock(layer.id)}
+            onClick={() => setActive(layer.id)}
+          />
         ))}
       </div>
-      
+
       {/* Espace vide pour remplir le reste de l'aside comme sur l'image */}
-      <div className="flex-1 bg-[#991616]"></div>
+      <div className="flex-1 bg-[#171717]"></div>
     </aside>
-    );
-};
+  );
+}
