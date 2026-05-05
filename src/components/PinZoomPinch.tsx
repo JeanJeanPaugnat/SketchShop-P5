@@ -28,8 +28,8 @@ export default function PinZoomPinch () {
           >
             <TransformComponent
               wrapperClass="!w-full !h-full !max-w-none !max-h-none rounded-none border-none overflow-hidden "
-              contentClass="!w-full !h-full "
-              infinite
+              contentClass="!w-full !h-full"
+              // infinite
             >
                 <Canvas activeTool={activeTool}/>
             </TransformComponent>
