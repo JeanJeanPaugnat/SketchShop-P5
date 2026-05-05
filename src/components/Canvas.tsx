@@ -17,8 +17,13 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   };
 
   p5.setup = () => {
-    p5.createCanvas(1200, 800, p5.WEBGL);
+    const canvas = p5.createCanvas(1200, 800);
     p5.background(255);
+    // Ensure the canvas style is handled correctly for high-DPI displays
+    // and doesn't conflict with parent scaling
+    canvas.style('display', 'block');
+    canvas.style('width', '100%');
+    canvas.style('height', '100%');
   };
 
 p5.draw = () => {
