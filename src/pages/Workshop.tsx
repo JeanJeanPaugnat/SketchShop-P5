@@ -1,5 +1,4 @@
 import Navbar from "../components/Navbar"
-import Canvas from "../components/Canvas"
 import PinZoomPinch from "../components/PinZoomPinch"
 
 export default function Workshop() {

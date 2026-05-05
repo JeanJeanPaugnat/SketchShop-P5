@@ -1,31 +1,22 @@
-import React from 'react';
-import { P5Canvas } from '@p5-wrapper/react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import ToolBox from './ToolBox';
+import * as React from "react";
+import { P5Canvas } from "@p5-wrapper/react";
+import type { Sketch } from "@p5-wrapper/react";
 
-type Tool = 'select' | 'move' | 'brush' | 'shapes';
-
-const sketch = (p5: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-  p5.setup = () => {
-    p5.createCanvas(800, 600);
-    p5.background(255);
-  };
+const sketch: Sketch = p5 => {
+  p5.setup = () => p5.createCanvas(600, 400, p5.WEBGL);
 
   p5.draw = () => {
-    if (p5.mouseIsPressed) {
-      p5.stroke(0);
-      p5.strokeWeight(5);
-      p5.line(p5.pmouseX, p5.pmouseY, p5.mouseX, p5.mouseY);
-    }
+    p5.background(250);
+    p5.normalMaterial();
+    p5.push();
+    p5.rotateZ(p5.frameCount * 0.01);
+    p5.rotateX(p5.frameCount * 0.01);
+    p5.rotateY(p5.frameCount * 0.01);
+    p5.plane(100);
+    p5.pop();
   };
 };
 
-const Canvas: React.FC = () => {
-
-  return (
-    <P5Canvas sketch={sketch} />
-
-  );
-};
-
-export default Canvas;
+export function Canvas() {
+  return <P5Canvas sketch={sketch} />;
+}

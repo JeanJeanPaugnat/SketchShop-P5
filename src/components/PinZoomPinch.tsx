@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import Canvas from "./Canvas";
+import { Canvas } from "./Canvas";
 import ToolBox from "./ToolBox";
+import type { Tool } from "../types";
 
 export default function PinZoomPinch () {
+  const [activeTool, setActiveTool] = useState<Tool>('brush');
+
   return (
-    <div className="flex-1 flex bg-gray-100 overflow-hidden">
+    <div className="flex-1 flex bg-gray-100 overflow-hidden ">
           <TransformWrapper
             initialScale={0.45}
             minScale={0.1}
@@ -25,14 +28,13 @@ export default function PinZoomPinch () {
           >
             <TransformComponent
               wrapperClass="w-full h-full rounded-none border-none overflow-hidden "
-              contentClass="h-full w-full"
+              contentClass="h-full w-full "
               infinite
             >
-                <img src="./Jean.jpg" alt="" />
-              {/* <Canvas /> */}
+                <Canvas />
             </TransformComponent>
           </TransformWrapper>
-            <ToolBox />
+          <ToolBox activeTool={activeTool} setActiveTool={setActiveTool} />
     </div>
   );
   
