@@ -1,0 +1,142 @@
+import React, { useState } from "react";
+
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { Canvas } from "./Canvas";
+import ToolBox from "./ToolBox";
+import SideBarLayer from "./SideBarLayer";
+import ContextualBar from "./ContextualBar";
+import ToolSettings from "./ToolSettings";
+import type { Tool, Layer, DrawingSettings } from "../types";
+
+export default function PinZoomPinch () {
+  const [activeTool, setActiveTool] = useState<Tool>('brush');
+  const [layers, setLayers] = useState<Layer[]>([
+    {
+      id: '1',
+      name: "Calque 1",
+      isVisible: true,
+      isLocked: false,
+      isActive: true,
+      opacity: 100,
+    }
+  ]);
+
+  const [settings, setSettings] = useState<DrawingSettings>({
+    color: '#000000',
+    brushSize: 5,
+    opacity: 100,
+    isDynamicBrush: false,
+    pixelSize: 10,
+    threshold: 128,
+    asciiScale: 10,
+  });
+
+  const [applyFilter, setApplyFilter] = useState<{ type: 'threshold' | 'pixelate' | 'ascii', timestamp: number } | undefined>();
+
+  const toggleVisibility = (id: string) => {
+    setLayers(layers.map(l => l.id === id ? { ...l, isVisible: !l.isVisible } : l));
+  };
+
+  const toggleLock = (id: string) => {
+    setLayers(layers.map(l => l.id === id ? { ...l, isLocked: !l.isLocked } : l));
+  };
+
+  const setActiveLayer = (id: string) => {
+    setLayers(layers.map(l => ({ ...l, isActive: l.id === id })));
+  };
+
+  const addLayer = () => {
+    const newLayer: Layer = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: `Calque ${layers.length + 1}`,
+      isVisible: true,
+      isLocked: false,
+      isActive: true,
+      opacity: 100,
+    };
+    setLayers([...layers.map(l => ({ ...l, isActive: false })), newLayer]);
+  };
+
+  const deleteActiveLayer = () => {
+    if (layers.length <= 1) return; // Keep at least one layer
+    
+    const activeIndex = layers.findIndex(l => l.isActive);
+    if (activeIndex === -1) return;
+
+    const newLayers = layers.filter((_, i) => i !== activeIndex);
+    
+    // Set a new active layer
+    const nextActiveIndex = Math.max(0, activeIndex - 1);
+    newLayers[nextActiveIndex].isActive = true;
+    
+    setLayers(newLayers);
+  };
+
+  const handleApplyFilter = (type: 'threshold' | 'pixelate' | 'ascii') => {
+    setApplyFilter({ type, timestamp: Date.now() });
+  };
+
+  return (
+    <div className="flex-1 flex bg-gray-100 overflow-hidden relative">
+          <TransformWrapper
+            initialScale={0.45}
+            minScale={0.1}
+            maxScale={4}
+            limitToBounds={false}
+            centerOnInit={true}
+            panning={{
+              disabled: activeTool !== 'move',
+              activationKeys: [],
+            }}
+            wheel={{
+              activationKeys: ["Control"],
+              step: 0.001,
+
+            }}
+            pinch={{
+              step: 5,
+            }}
+            trackPadPanning={{
+              disabled: activeTool !== 'move',
+            }}
+          >
+            <TransformComponent
+              wrapperClass="!w-full !h-full !max-w-none !max-h-none rounded-none border-none overflow-hidden "
+              contentClass="!w-full !h-full flex items-center justify-center"
+            >
+                <div style={{ width: '1200px', height: '800px' }}>
+                  <Canvas 
+                    activeTool={activeTool} 
+                    layers={layers} 
+                    settings={settings}
+                    applyFilter={applyFilter}
+                  />
+                </div>
+            </TransformComponent>
+          </TransformWrapper>
+          <ToolBox activeTool={activeTool} setActiveTool={setActiveTool} />
+          
+          <ContextualBar 
+            activeTool={activeTool}
+            settings={settings}
+            setSettings={setSettings}
+          />
+          
+          {/* <ToolSettings 
+            settings={settings} 
+            setSettings={setSettings} 
+            onApplyFilter={handleApplyFilter}
+          /> */}
+
+          <SideBarLayer 
+            layers={layers} 
+            toggleVisibility={toggleVisibility} 
+            toggleLock={toggleLock} 
+            setActiveLayer={setActiveLayer}
+            addLayer={addLayer}
+            deleteActiveLayer={deleteActiveLayer}
+          />
+    </div>
+  );
+};
+

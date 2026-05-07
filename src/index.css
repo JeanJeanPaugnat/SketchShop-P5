@@ -6,3 +6,15 @@ body {
     font-family: 'Manrope', sans-serif;
 
 }
+
+@layer utilities {
+  .h-fill-available {
+    height: -webkit-fill-available;
+    height: fill-available;
+  }
+
+  .w-fill-available {
+    width: -webkit-fill-available;
+    width: fill-available;
+  }
+}

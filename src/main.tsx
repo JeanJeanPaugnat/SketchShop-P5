@@ -4,7 +4,7 @@ import './index.css'
 import Workshop from './pages/Workshop'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <Workshop />
-  </StrictMode>,
+  // </StrictMode>,
 )
