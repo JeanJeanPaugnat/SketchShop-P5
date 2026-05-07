@@ -21,7 +21,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     p5.background(255);
     // Ensure the canvas style is handled correctly for high-DPI displays
     // and doesn't conflict with parent scaling
-
+    addNewLayer();
   };
 
 p5.draw = () => {
@@ -49,6 +49,13 @@ p5.draw = () => {
       }
     }
   };
+
+
+  function addNewLayer() {
+    const newLayer = p5.createGraphics(1200, 800);
+    console.log('New layer created:', newLayer);
+    return newLayer;
+  }
 };
 
 export function Canvas({ activeTool }: CanvasProps) {
