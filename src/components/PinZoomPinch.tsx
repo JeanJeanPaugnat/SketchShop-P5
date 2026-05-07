@@ -4,6 +4,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Canvas } from "./Canvas";
 import ToolBox from "./ToolBox";
 import SideBarLayer from "./SideBarLayer";
+import ToolSettings from "./ToolSettings";
 import type { Tool, Layer, DrawingSettings } from "../types";
 
 export default function PinZoomPinch () {
@@ -27,6 +28,8 @@ export default function PinZoomPinch () {
     threshold: 128,
     asciiScale: 10,
   });
+
+  const [applyFilter, setApplyFilter] = useState<{ type: 'threshold' | 'pixelate' | 'ascii', timestamp: number } | undefined>();
 
   const toggleVisibility = (id: string) => {
     setLayers(layers.map(l => l.id === id ? { ...l, isVisible: !l.isVisible } : l));
@@ -52,8 +55,12 @@ export default function PinZoomPinch () {
     setLayers([...layers.map(l => ({ ...l, isActive: false })), newLayer]);
   };
 
+  const handleApplyFilter = (type: 'threshold' | 'pixelate' | 'ascii') => {
+    setApplyFilter({ type, timestamp: Date.now() });
+  };
+
   return (
-    <div className="flex-1 flex bg-gray-100 overflow-hidden ">
+    <div className="flex-1 flex bg-gray-100 overflow-hidden relative">
           <TransformWrapper
             initialScale={0.45}
             minScale={0.1}
@@ -85,11 +92,19 @@ export default function PinZoomPinch () {
                     activeTool={activeTool} 
                     layers={layers} 
                     settings={settings}
+                    applyFilter={applyFilter}
                   />
                 </div>
             </TransformComponent>
           </TransformWrapper>
           <ToolBox activeTool={activeTool} setActiveTool={setActiveTool} />
+          
+          <ToolSettings 
+            settings={settings} 
+            setSettings={setSettings} 
+            onApplyFilter={handleApplyFilter}
+          />
+
           <SideBarLayer 
             layers={layers} 
             toggleVisibility={toggleVisibility} 

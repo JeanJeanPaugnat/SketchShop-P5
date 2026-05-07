@@ -1,4 +1,4 @@
-export type Tool = 'select' | 'move' | 'brush' | 'pencil' | 'eraser' | 'shapes' | 'square' | 'pixelate' | 'threshold' | 'ascii';
+export type Tool = 'select' | 'move' | 'brush'  | 'eraser' | 'shapes' | 'square' | 'pixelate' | 'threshold' | 'ascii';
 
 export interface Layer {
   id: string;

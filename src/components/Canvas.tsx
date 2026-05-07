@@ -8,6 +8,7 @@ interface CanvasProps {
   layers: Layer[];
   settings: DrawingSettings;
   applyFilter?: { type: 'threshold' | 'pixelate' | 'ascii', timestamp: number };
+  [key: string]: any;
 }
 
 const sketch: Sketch<CanvasProps> = (p5) => {
@@ -55,9 +56,24 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   };
 
   p5.setup = () => {
-    p5.createCanvas(1200, 800);
+    const canvas = p5.createCanvas(1200, 800);
     p5.background(255);
+    canvas.drop(handleFileDrop);
   };
+
+  function handleFileDrop(file: any) {
+    if (file.type === 'image') {
+      p5.loadImage(file.data, (img) => {
+        const activeLayer = layersData.find(l => l.isActive);
+        if (activeLayer) {
+          const g = layerGraphics.get(activeLayer.id);
+          if (g) {
+            g.image(img, 0, 0);
+          }
+        }
+      });
+    }
+  }
 
   p5.draw = () => {
     p5.background(255);
@@ -130,7 +146,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   function updateCursor() {
     switch (activeTool) {
       case 'brush':
-      case 'pencil':
       case 'eraser':
         p5.cursor(p5.CROSS);
         break;
@@ -146,7 +161,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   }
 
   function handleDrawing(g: any) {
-    if (activeTool === 'brush' || activeTool === 'pencil') {
+    if (activeTool === 'brush') {
       g.stroke(settingsData.color);
       let sw = settingsData.brushSize;
       if (settingsData.isDynamicBrush) {
