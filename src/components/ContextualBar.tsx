@@ -60,22 +60,6 @@ export default function ContextualBar({ activeTool, settings, setSettings }: Con
         />
       </div>
 
-      {/* Hardness Control */}
-      <div className="flex flex-col gap-1 w-24">
-        <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase">
-          <span>Hardness</span>
-          <span>{settings.hardness}%</span>
-        </div>
-        <input 
-          type="range" 
-          min="0" 
-          max="100" 
-          value={settings.hardness}
-          onChange={(e) => updateSetting('hardness', parseInt(e.target.value))}
-          className="h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-violet-500"
-        />
-      </div>
-
       {/* Color Picker (Compact) */}
       <div className="flex items-center gap-2 pl-4 border-l border-white/10">
         <input 

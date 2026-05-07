@@ -13,7 +13,6 @@ export interface DrawingSettings {
   color: string;
   brushSize: number;
   opacity: number;
-  hardness: number;
   isDynamicBrush: boolean;
   pixelSize: number;
   threshold: number;

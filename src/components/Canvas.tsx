@@ -17,12 +17,11 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   let settingsData: DrawingSettings = {
     color: '#000000',
     brushSize: 5,
+    opacity: 100,
     isDynamicBrush: false,
     pixelSize: 10,
     threshold: 128,
     asciiScale: 10,
-    opacity: 100,
-    hardness: 80,
   };
 
   const layerGraphics = new Map<string, any>();
@@ -30,6 +29,25 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   let speedHistory: number[] = [];
   const SPEED_HISTORY_SIZE = 5;
   let lastFilterTimestamp = 0;
+
+  // Track transformed coordinates to fix the offset issue
+  let localMouse = { x: 0, y: 0 };
+  let prevLocalMouse = { x: 0, y: 0 };
+
+  function updateLocalMouse() {
+    prevLocalMouse = { ...localMouse };
+    const canvasElement = (p5 as any).canvas;
+    if (canvasElement) {
+      const rect = canvasElement.getBoundingClientRect();
+      
+      // Map window coordinates (winMouseX) to internal canvas coordinates (1200x800)
+      const scaleX = 1200 / rect.width;
+      const scaleY = 800 / rect.height;
+      
+      localMouse.x = (p5.winMouseX - rect.left) * scaleX;
+      localMouse.y = (p5.winMouseY - rect.top) * scaleY;
+    }
+  }
 
   p5.updateWithProps = (props) => {
     activeTool = props.activeTool;
@@ -78,6 +96,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   }
 
   p5.draw = () => {
+    updateLocalMouse();
     p5.background(255);
     updateCursor();
 
@@ -110,20 +129,22 @@ const sketch: Sketch<CanvasProps> = (p5) => {
       p5.rect(
         rectangleStart.x,
         rectangleStart.y,
-        p5.mouseX - rectangleStart.x,
-        p5.mouseY - rectangleStart.y
+        localMouse.x - rectangleStart.x,
+        localMouse.y - rectangleStart.y
       );
       p5.pop();
     }
   };
 
   p5.mousePressed = () => {
+    updateLocalMouse();
     if (activeTool === 'square') {
-      rectangleStart = { x: p5.mouseX, y: p5.mouseY };
+      rectangleStart = { x: localMouse.x, y: localMouse.y };
     }
   };
 
   p5.mouseReleased = () => {
+    updateLocalMouse();
     if (activeTool === 'square' && rectangleStart) {
       const activeLayer = layersData.find(l => l.isActive);
       if (activeLayer && !activeLayer.isLocked) {
@@ -135,8 +156,8 @@ const sketch: Sketch<CanvasProps> = (p5) => {
           g.rect(
             rectangleStart.x,
             rectangleStart.y,
-            p5.mouseX - rectangleStart.x,
-            p5.mouseY - rectangleStart.y
+            localMouse.x - rectangleStart.x,
+            localMouse.y - rectangleStart.y
           );
           g.pop();
         }
@@ -170,25 +191,22 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 
       let sw = settingsData.brushSize;
       if (settingsData.isDynamicBrush) {
-        sw = calculateDynamicStrokeWeight(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
+        sw = calculateDynamicStrokeWeight(localMouse.x, localMouse.y, prevLocalMouse.x, prevLocalMouse.y);
       }
 
-      // Simulating hardness is complex in simple p5 lines
-      // For now, we use the opacity. Hardness could be a custom shader or a masked brush tip.
       g.strokeWeight(sw);
-      g.line(p5.pmouseX, p5.pmouseY, p5.mouseX, p5.mouseY);
+      g.line(prevLocalMouse.x, prevLocalMouse.y, localMouse.x, localMouse.y);
     } else if (activeTool === 'eraser') {
       g.erase();
       g.strokeWeight(settingsData.brushSize);
-      g.line(p5.pmouseX, p5.pmouseY, p5.mouseX, p5.mouseY);
+      g.line(prevLocalMouse.x, prevLocalMouse.y, localMouse.x, localMouse.y);
       g.noErase();
     } else if (activeTool === 'shapes') {
       g.noStroke();
       const c = p5.color(settingsData.color);
-      // Multiply base opacity by shape alpha
       c.setAlpha((settingsData.opacity / 100) * 50);
       g.fill(c);
-      g.ellipse(p5.mouseX, p5.mouseY, settingsData.brushSize * 2, settingsData.brushSize * 2);
+      g.ellipse(localMouse.x, localMouse.y, settingsData.brushSize * 2, settingsData.brushSize * 2);
     }
   }
 
@@ -324,4 +342,3 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 export function Canvas({ activeTool, layers, settings, applyFilter }: CanvasProps) {
   return <P5Canvas sketch={sketch} activeTool={activeTool} layers={layers} settings={settings} applyFilter={applyFilter} />;
 }
-

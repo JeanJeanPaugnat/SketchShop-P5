@@ -1,5 +1,6 @@
 import LayerCard from "./ui/LayerCard";
 import type { Layer } from "../types";
+import { PlusBox } from 'pixelarticons/react';
 
 interface SideBarLayerProps {
   layers: Layer[];
@@ -17,21 +18,8 @@ export default function SideBarLayer({
   addLayer 
 }: SideBarLayerProps) {
   return (
-    <aside className="flex flex-col right-0 gap-4 absolute h-fill-available m-6 bg-[#171717] z-10 w-64">
-      <div className="flex justify-between items-center p-4 text-white border-b border-[#333]">
-        <h2 className="text-sm font-bold uppercase tracking-wider">Layers</h2>
-        <button 
-          onClick={addLayer}
-          className="hover:bg-[#8354E0] p-1 rounded transition-colors"
-          title="Add Layer"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-        </button>
-      </div>
-      <div className="flex flex-col py-2 px-2 gap-1 overflow-y-auto max-h-[60vh]">
+    <aside className="flex flex-col right-0 absolute h-fill-available m-6 bg-[#171717] z-10">
+      <div className="flex flex-1 flex-col py-2 px-2 gap-1 overflow-x-auto scrollbar-thin">
         {[...layers].reverse().map((layer) => (
           <LayerCard
             key={layer.id}
@@ -48,7 +36,13 @@ export default function SideBarLayer({
         ))}
       </div>
 
-      <div className="flex-1 bg-[#171717]"></div>
+      <div className=" bg-[#252525] text-[#ADAAAA] flex items-center justify-center gap-4 p-3 cursor-pointer ">
+        <PlusBox onClick={addLayer} className=" transition-colors hover:text-[#8354E0]" width={18} height={18} />
+
+        <svg  className=" transition-colors hover:text-[#8354E0]" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 22H4V20H18V22ZM4 20H2V6H0V4H6V2H8V4H14V2H16V4H22V6H20V20H18V6H4V20ZM9 17H7V8H9V17ZM15 17H13V8H15V17ZM14 2H8V0H14V2Z" fill="currentColor"/>
+        </svg>
+      </div>
     </aside>
   );
 }

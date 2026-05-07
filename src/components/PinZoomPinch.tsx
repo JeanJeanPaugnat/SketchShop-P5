@@ -25,7 +25,6 @@ export default function PinZoomPinch () {
     color: '#000000',
     brushSize: 5,
     opacity: 100,
-    hardness: 80,
     isDynamicBrush: false,
     pixelSize: 10,
     threshold: 128,
