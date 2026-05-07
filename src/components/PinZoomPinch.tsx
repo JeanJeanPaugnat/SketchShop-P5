@@ -57,6 +57,21 @@ export default function PinZoomPinch () {
     setLayers([...layers.map(l => ({ ...l, isActive: false })), newLayer]);
   };
 
+  const deleteActiveLayer = () => {
+    if (layers.length <= 1) return; // Keep at least one layer
+    
+    const activeIndex = layers.findIndex(l => l.isActive);
+    if (activeIndex === -1) return;
+
+    const newLayers = layers.filter((_, i) => i !== activeIndex);
+    
+    // Set a new active layer
+    const nextActiveIndex = Math.max(0, activeIndex - 1);
+    newLayers[nextActiveIndex].isActive = true;
+    
+    setLayers(newLayers);
+  };
+
   const handleApplyFilter = (type: 'threshold' | 'pixelate' | 'ascii') => {
     setApplyFilter({ type, timestamp: Date.now() });
   };
@@ -119,6 +134,7 @@ export default function PinZoomPinch () {
             toggleLock={toggleLock} 
             setActiveLayer={setActiveLayer}
             addLayer={addLayer}
+            deleteActiveLayer={deleteActiveLayer}
           />
     </div>
   );
