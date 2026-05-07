@@ -21,6 +21,8 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     pixelSize: 10,
     threshold: 128,
     asciiScale: 10,
+    opacity: 100,
+    hardness: 80,
   };
 
   const layerGraphics = new Map<string, any>();
@@ -162,11 +164,17 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 
   function handleDrawing(g: any) {
     if (activeTool === 'brush') {
-      g.stroke(settingsData.color);
+      const c = p5.color(settingsData.color);
+      c.setAlpha((settingsData.opacity / 100) * 255);
+      g.stroke(c);
+
       let sw = settingsData.brushSize;
       if (settingsData.isDynamicBrush) {
         sw = calculateDynamicStrokeWeight(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
       }
+
+      // Simulating hardness is complex in simple p5 lines
+      // For now, we use the opacity. Hardness could be a custom shader or a masked brush tip.
       g.strokeWeight(sw);
       g.line(p5.pmouseX, p5.pmouseY, p5.mouseX, p5.mouseY);
     } else if (activeTool === 'eraser') {
@@ -177,11 +185,13 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     } else if (activeTool === 'shapes') {
       g.noStroke();
       const c = p5.color(settingsData.color);
-      c.setAlpha(50);
+      // Multiply base opacity by shape alpha
+      c.setAlpha((settingsData.opacity / 100) * 50);
       g.fill(c);
       g.ellipse(p5.mouseX, p5.mouseY, settingsData.brushSize * 2, settingsData.brushSize * 2);
     }
   }
+
 
   function calculateDynamicStrokeWeight(x: number, y: number, px: number, py: number) {
     const dx = x - px;

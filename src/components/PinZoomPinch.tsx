@@ -4,6 +4,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Canvas } from "./Canvas";
 import ToolBox from "./ToolBox";
 import SideBarLayer from "./SideBarLayer";
+import ContextualBar from "./ContextualBar";
 import ToolSettings from "./ToolSettings";
 import type { Tool, Layer, DrawingSettings } from "../types";
 
@@ -23,6 +24,8 @@ export default function PinZoomPinch () {
   const [settings, setSettings] = useState<DrawingSettings>({
     color: '#000000',
     brushSize: 5,
+    opacity: 100,
+    hardness: 80,
     isDynamicBrush: false,
     pixelSize: 10,
     threshold: 128,
@@ -99,11 +102,17 @@ export default function PinZoomPinch () {
           </TransformWrapper>
           <ToolBox activeTool={activeTool} setActiveTool={setActiveTool} />
           
-          <ToolSettings 
+          <ContextualBar 
+            activeTool={activeTool}
+            settings={settings}
+            setSettings={setSettings}
+          />
+          
+          {/* <ToolSettings 
             settings={settings} 
             setSettings={setSettings} 
             onApplyFilter={handleApplyFilter}
-          />
+          /> */}
 
           <SideBarLayer 
             layers={layers} 
