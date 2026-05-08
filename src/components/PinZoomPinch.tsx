@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Canvas } from "./Canvas";
 import ToolBox from "./ToolBox";
 import SideBarLayer from "./SideBarLayer";
 import ContextualBar from "./ContextualBar";
-import ToolSettings from "./ToolSettings";
 import type { Tool, Layer, DrawingSettings } from "../types";
 
 export default function PinZoomPinch () {
@@ -72,10 +71,6 @@ export default function PinZoomPinch () {
     setLayers(newLayers);
   };
 
-  const handleApplyFilter = (type: 'threshold' | 'pixelate' | 'ascii') => {
-    setApplyFilter({ type, timestamp: Date.now() });
-  };
-
   return (
     <>
     <ContextualBar 
@@ -132,6 +127,7 @@ export default function PinZoomPinch () {
 
           <SideBarLayer 
             layers={layers} 
+            setLayers={setLayers}
             toggleVisibility={toggleVisibility} 
             toggleLock={toggleLock} 
             setActiveLayer={setActiveLayer}
