@@ -1,7 +1,6 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import Workshop from './pages/Workshop'
+import Workshop from './layout/Workshop'
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>

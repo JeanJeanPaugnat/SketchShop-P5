@@ -1,19 +1,7 @@
-import type { DrawingSettings, Tool } from '../types';
+import { useEditorStore } from '../../store/useEditorStore';
 
-interface ContextualBarProps {
-  activeTool: Tool;
-  settings: DrawingSettings;
-  setSettings: (settings: DrawingSettings) => void;
-}
-
-export default function ContextualBar({ 
-  activeTool, 
-  settings, 
-  setSettings, 
-}: ContextualBarProps) {
-  const updateSetting = (key: keyof DrawingSettings, value: any) => {
-    setSettings({ ...settings, [key]: value });
-  };
+export default function ContextualBar() {
+  const { activeTool, settings, updateSetting } = useEditorStore();
 
   return (
     <div className="flex items-center gap-6 px-6 py-2 bg-[#131313] text-white">

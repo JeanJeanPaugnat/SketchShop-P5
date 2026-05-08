@@ -1,8 +1,8 @@
 import { useState } from "react"
-import Button from "./ui/Button"
+import Button from "./Button"
 import { motion } from "motion/react"
 import { AvatarCircle, SettingsCog2 } from 'pixelarticons/react'
-import logoLineSketch from "../assets/logo-line-Sketch.svg"
+import logoLineSketch from "../../assets/logo-line-Sketch.svg"
 
 const NAV_ITEMS = ["FILE", "EDIT", "VIEW"] as const
 

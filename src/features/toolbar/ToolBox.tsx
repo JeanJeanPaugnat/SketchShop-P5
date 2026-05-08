@@ -1,19 +1,8 @@
-import React from 'react';
 import { CursorMinimal, Hand, Shapes, Brush} from 'pixelarticons/react';
-import type { Tool, DrawingSettings } from '../types';
+import { useEditorStore } from '../../store/useEditorStore';
 
-interface ToolBoxProps {
-  activeTool: Tool;
-  setActiveTool: (tool: Tool) => void;
-  settings: DrawingSettings;
-  setSettings: (settings: DrawingSettings) => void;
-}
-
-export default function ToolBox({ activeTool, setActiveTool, settings, setSettings }: ToolBoxProps){
-
-    const updateSetting = (key: keyof DrawingSettings, value: any) => {
-      setSettings({ ...settings, [key]: value });
-    };
+export default function ToolBox() {
+  const { activeTool, setActiveTool, settings, updateSetting } = useEditorStore();
 
   return (
     <div className="flex flex-col justify-between py-2 gap-4 absolute h-fill-available m-6 bg-[#171717] z-10">
@@ -74,5 +63,4 @@ export default function ToolBox({ activeTool, setActiveTool, settings, setSettin
       </div>
     </div>
   );
-};
-
+}

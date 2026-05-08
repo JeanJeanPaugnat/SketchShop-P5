@@ -1,5 +1,4 @@
-import React from 'react';
-import { Eye, EyeOff, Lock, Unlock } from 'pixelarticons/react';
+import { Eye, EyeOff, Lock, Unlock, Menu } from 'pixelarticons/react';
 
 interface LayerCardProps {
   title: string;
@@ -31,6 +30,7 @@ export default function LayerCard({
         isActive ? 'bg-[#8354E0] text-white' : 'bg-transparent text-gray-400 hover:bg-[#2A2A2A]'
       }`}
     >
+
       {/* Visibility Toggle */}
       <button
         onClick={(e) => {

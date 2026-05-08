@@ -1,5 +1,4 @@
-import React from 'react';
-import type { DrawingSettings } from '../types';
+import type { DrawingSettings } from '../../core/types';
 
 interface ToolSettingsProps {
   settings: DrawingSettings;
