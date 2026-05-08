@@ -1,6 +1,4 @@
-import React from 'react';
 import type { DrawingSettings, Tool } from '../types';
-import { Brush } from 'pixelarticons/react';
 
 interface ContextualBarProps {
   activeTool: Tool;
@@ -8,7 +6,11 @@ interface ContextualBarProps {
   setSettings: (settings: DrawingSettings) => void;
 }
 
-export default function ContextualBar({ activeTool, settings, setSettings }: ContextualBarProps) {
+export default function ContextualBar({ 
+  activeTool, 
+  settings, 
+  setSettings, 
+}: ContextualBarProps) {
   const updateSetting = (key: keyof DrawingSettings, value: any) => {
     setSettings({ ...settings, [key]: value });
   };

@@ -11,6 +11,8 @@ interface SideBarLayerProps {
   setActiveLayer: (id: string) => void;
   addLayer: () => void;
   deleteActiveLayer: () => void;
+  onApplyFilter: (type: 'threshold' | 'pixelate' | 'ascii') => void;
+  onActiveLayerOpacityChange: (opacity: number) => void;
 }
 
 export default function SideBarLayer({ 
@@ -20,24 +22,56 @@ export default function SideBarLayer({
   toggleLock, 
   setActiveLayer,
   addLayer,
-  deleteActiveLayer
+  deleteActiveLayer,
+  onApplyFilter,
+  onActiveLayerOpacityChange
 }: SideBarLayerProps) {
   const reversedLayers = [...layers].reverse();
+  const activeLayer = layers.find(l => l.isActive);
 
   const handleReorder = (newOrder: Layer[]) => {
     setLayers([...newOrder].reverse());
   };
 
   return (
-    <aside className="flex flex-col right-0 absolute h-fill-available m-6 bg-[#171717] z-10">
-      <div className="flex flex-row gap-1">
-        
+    <aside className="flex flex-col right-0 absolute h-fill-available m-6 bg-[#171717] z-10 ">
+      {/* Layer Settings (Filter & Opacity) */}
+      <div className="flex flex-row justify-between px-4 py-2">
+        <div className="flex flex-col gap-1">
+          <select 
+            onChange={(e) => e.target.value !== "none" && onApplyFilter(e.target.value as any)}
+            className="bg-[#2A2A2A] text-white text-xs py-1 px-2 w-32 h-8 border-none outline-none cursor-pointer"
+            defaultValue="none"
+          >
+            <option value="none">Normal</option>
+            <option value="threshold">Threshold</option>
+            <option value="pixelate">Pixelate</option>
+            <option value="ascii">ASCII</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase">
+            <span>Opacity</span>
+            <span>{activeLayer?.opacity ?? 100}%</span>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            value={activeLayer?.opacity ?? 100}
+            onChange={(e) => onActiveLayerOpacityChange(parseInt(e.target.value))}
+            className="h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-violet-500"
+          />
+        </div>
       </div>
+
+      {/* Layers List */}
       <Reorder.Group 
         axis="y" 
         values={reversedLayers} 
         onReorder={handleReorder}
-        className="flex flex-1 flex-col py-2 px-2 gap-1 overflow-y-auto scrollbar-thin"
+        className="flex flex-1 flex-col py-2 px-2 gap-1 overflow-y-auto overflow-x-hidden scrollbar-thin"
       >
         {reversedLayers.map((layer) => (
           <Reorder.Item 
@@ -60,6 +94,7 @@ export default function SideBarLayer({
         ))}
       </Reorder.Group>
 
+      {/* Footer Actions */}
       <div className=" bg-[#252525] text-[#ADAAAA] flex items-center justify-center gap-4 p-3  ">
         <PlusBox onClick={addLayer} className="cursor-pointer transition-colors hover:text-[#8354E0]" width={18} height={18} />
 

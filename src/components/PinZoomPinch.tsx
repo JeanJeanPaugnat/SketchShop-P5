@@ -71,6 +71,14 @@ export default function PinZoomPinch () {
     setLayers(newLayers);
   };
 
+  const handleApplyFilter = (type: 'threshold' | 'pixelate' | 'ascii') => {
+    setApplyFilter({ type, timestamp: Date.now() });
+  };
+
+  const handleActiveLayerOpacityChange = (opacity: number) => {
+    setLayers(layers.map(l => l.isActive ? { ...l, opacity } : l));
+  };
+
   return (
     <>
     <ContextualBar 
@@ -133,6 +141,8 @@ export default function PinZoomPinch () {
             setActiveLayer={setActiveLayer}
             addLayer={addLayer}
             deleteActiveLayer={deleteActiveLayer}
+            onApplyFilter={handleApplyFilter}
+            onActiveLayerOpacityChange={handleActiveLayerOpacityChange}
           />
     </div>
     </>
