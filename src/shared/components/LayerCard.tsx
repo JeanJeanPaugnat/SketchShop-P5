@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Lock, Unlock, Menu } from 'pixelarticons/react';
+import { Eye, EyeOff, Lock, Unlock } from 'pixelarticons/react';
 
 interface LayerCardProps {
   title: string;
@@ -43,7 +43,7 @@ export default function LayerCard({
       </button>
 
       {/* Thumbnail */}
-      <div className={`w-10 h-10 bg-[#1A1A1A] border flex-shrink-0 overflow-hidden ${
+      <div className={`w-10 h-10 bg-[#1A1A1A] border shrink-0 overflow-hidden ${
         isActive ? 'border-purple-400' : 'border-gray-700'
       }`}>
         {thumbnail ? (

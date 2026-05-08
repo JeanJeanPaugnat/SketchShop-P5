@@ -6,7 +6,7 @@ import ContextualBar from "../features/toolbar/ContextualBar";
 import { useEditorStore } from "../store/useEditorStore";
 
 export default function PinZoomPinch () {
-  const { activeTool } = useEditorStore();
+  const { activeTool, canvasDimensions } = useEditorStore();
 
   return (
     <>
@@ -38,7 +38,7 @@ export default function PinZoomPinch () {
               wrapperClass="!w-full !h-full !max-w-none !max-h-none rounded-none border-none overflow-hidden "
               contentClass="!w-full !h-full flex items-center justify-center"
             >
-                <div style={{ width: '1200px', height: '800px' }}>
+                <div style={{ width: `${canvasDimensions.width}px`, height: `${canvasDimensions.height}px` }}>
                   <Canvas />
                 </div>
             </TransformComponent>

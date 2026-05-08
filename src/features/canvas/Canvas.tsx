@@ -8,6 +8,7 @@ interface CanvasProps {
   activeTool: Tool;
   layers: Layer[];
   settings: DrawingSettings;
+  canvasDimensions: { width: number; height: number };
   applyFilter?: { type: 'threshold' | 'pixelate' | 'ascii', timestamp: number };
   [key: string]: any;
 }
@@ -15,6 +16,7 @@ interface CanvasProps {
 const sketch: Sketch<CanvasProps> = (p5) => {
   let activeTool: Tool = 'brush';
   let layersData: Layer[] = [];
+  let canvasDimensions: { width: number; height: number } = { width: 1200, height: 800 };
   let settingsData: DrawingSettings = {
     color: '#000000',
     brushSize: 5,
@@ -39,8 +41,8 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     const canvasElement = (p5 as any).canvas;
     if (canvasElement) {
       const rect = canvasElement.getBoundingClientRect();
-      const scaleX = 1200 / rect.width;
-      const scaleY = 800 / rect.height;
+      const scaleX = canvasDimensions.width / rect.width;
+      const scaleY = canvasDimensions.height / rect.height;
       localMouse.x = (p5.winMouseX - rect.left) * scaleX;
       localMouse.y = (p5.winMouseY - rect.top) * scaleY;
     }
@@ -50,10 +52,16 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     activeTool = props.activeTool;
     layersData = props.layers;
     settingsData = props.settings;
+    
+    if (props.canvasDimensions.width !== canvasDimensions.width || props.canvasDimensions.height !== canvasDimensions.height) {
+        canvasDimensions = props.canvasDimensions;
+        p5.resizeCanvas(canvasDimensions.width, canvasDimensions.height);
+        layerGraphics.forEach((g) => g.resizeCanvas(canvasDimensions.width, canvasDimensions.height));
+    }
 
     layersData.forEach(layer => {
       if (!layerGraphics.has(layer.id)) {
-        const g = p5.createGraphics(1200, 800);
+        const g = p5.createGraphics(canvasDimensions.width, canvasDimensions.height);
         layerGraphics.set(layer.id, g);
       }
     });
@@ -85,7 +93,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   }
 
   p5.setup = () => {
-    const canvas = p5.createCanvas(1200, 800);
+    const canvas = p5.createCanvas(canvasDimensions.width, canvasDimensions.height);
     p5.background(255);
     canvas.drop(handleFileDrop);
   };
@@ -247,7 +255,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 };
 
 export function Canvas() {
-  const { activeTool, layers, settings, applyFilter } = useEditorStore();
+  const { activeTool, layers, settings, applyFilter, canvasDimensions } = useEditorStore();
   
   return (
     <P5Canvas 
@@ -256,6 +264,7 @@ export function Canvas() {
       layers={layers} 
       settings={settings} 
       applyFilter={applyFilter} 
+      canvasDimensions={canvasDimensions}
     />
   );
 }

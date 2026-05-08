@@ -2,6 +2,10 @@ import { create } from 'zustand';
 import type { Tool, Layer, DrawingSettings } from '../core/types';
 
 interface EditorState {
+  // Canvas State
+  canvasDimensions: { width: number; height: number };
+  setCanvasDimensions: (dimensions: { width: number; height: number }) => void;
+
   // Tool State
   activeTool: Tool;
   setActiveTool: (tool: Tool) => void;
@@ -20,6 +24,7 @@ interface EditorState {
   addLayer: () => void;
   deleteActiveLayer: () => void;
   updateActiveLayerOpacity: (opacity: number) => void;
+  resetEditor: (dimensions: { width: number; height: number }) => void;
 
   // Filter State
   applyFilter: { type: 'threshold' | 'pixelate' | 'ascii', timestamp: number } | undefined;
@@ -27,6 +32,10 @@ interface EditorState {
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
+  // Canvas State
+  canvasDimensions: { width: 1200, height: 800 },
+  setCanvasDimensions: (canvasDimensions) => set({ canvasDimensions }),
+
   // Tool State
   activeTool: 'brush',
   setActiveTool: (tool) => set({ activeTool: tool }),
@@ -93,6 +102,21 @@ export const useEditorStore = create<EditorState>((set) => ({
   updateActiveLayerOpacity: (opacity) => set((state) => ({
     layers: state.layers.map(l => l.isActive ? { ...l, opacity } : l)
   })),
+  resetEditor: (dimensions) => set({
+    canvasDimensions: dimensions,
+    layers: [
+      {
+        id: '1',
+        name: "Calque 1",
+        isVisible: true,
+        isLocked: false,
+        isActive: true,
+        opacity: 100,
+      }
+    ],
+    activeTool: 'brush',
+    applyFilter: undefined,
+  }),
 
   // Filter State
   applyFilter: undefined,
