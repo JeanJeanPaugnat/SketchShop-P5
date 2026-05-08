@@ -77,6 +77,12 @@ export default function PinZoomPinch () {
   };
 
   return (
+    <>
+    <ContextualBar 
+      activeTool={activeTool}
+      settings={settings}
+      setSettings={setSettings}
+    />
     <div className="flex-1 flex bg-gray-100 overflow-hidden relative">
           <TransformWrapper
             initialScale={0.45}
@@ -114,13 +120,9 @@ export default function PinZoomPinch () {
                 </div>
             </TransformComponent>
           </TransformWrapper>
-          <ToolBox activeTool={activeTool} setActiveTool={setActiveTool} />
+          <ToolBox  activeTool={activeTool} setActiveTool={setActiveTool} settings={settings} setSettings={setSettings} />
           
-          <ContextualBar 
-            activeTool={activeTool}
-            settings={settings}
-            setSettings={setSettings}
-          />
+
           
           {/* <ToolSettings 
             settings={settings} 
@@ -137,6 +139,7 @@ export default function PinZoomPinch () {
             deleteActiveLayer={deleteActiveLayer}
           />
     </div>
+    </>
   );
 };
 

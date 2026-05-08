@@ -1,6 +1,6 @@
 import React from 'react';
 import type { DrawingSettings, Tool } from '../types';
-import { Brush, Minus, } from 'pixelarticons/react';
+import { Brush } from 'pixelarticons/react';
 
 interface ContextualBarProps {
   activeTool: Tool;
@@ -13,18 +13,10 @@ export default function ContextualBar({ activeTool, settings, setSettings }: Con
     setSettings({ ...settings, [key]: value });
   };
 
-  const isBrushLike = activeTool === 'brush'|| activeTool === 'eraser';
-
-  if (!isBrushLike) return null;
-
   return (
-    <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-6 px-6 py-2 bg-[#171717]/90 backdrop-blur-md text-white z-20 border border-white/10 shadow-2xl rounded-full">
+    <div className="flex items-center gap-6 px-6 py-2 bg-[#131313] text-white">
       {/* Tool Indicator */}
-      <div className="flex items-center gap-2 pr-4 border-r border-white/10">
-        <div className="w-8 h-8 flex items-center justify-center bg-violet-500 rounded-full">
-          {activeTool === 'brush' && <Brush width={18} />}
-          {activeTool === 'eraser' && <div className="w-4 h-4 bg-white rotate-45" />}
-        </div>
+      <div className="flex items-center gap-1 pr-4 border-r border-white/10">
         <span className="text-xs font-bold uppercase tracking-wider">{activeTool}</span>
       </div>
 
@@ -62,12 +54,6 @@ export default function ContextualBar({ activeTool, settings, setSettings }: Con
 
       {/* Color Picker (Compact) */}
       <div className="flex items-center gap-2 pl-4 border-l border-white/10">
-        <input 
-          type="color" 
-          value={settings.color}
-          onChange={(e) => updateSetting('color', e.target.value)}
-          className="w-6 h-6 rounded-full overflow-hidden bg-transparent border-none cursor-pointer p-0"
-        />
         <div className="flex items-center gap-2 ml-2">
           <input 
             type="checkbox" 

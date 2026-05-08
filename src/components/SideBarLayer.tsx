@@ -38,12 +38,12 @@ export default function SideBarLayer({
         ))}
       </div>
 
-      <div className=" bg-[#252525] text-[#ADAAAA] flex items-center justify-center gap-4 p-3 cursor-pointer ">
-        <PlusBox onClick={addLayer} className=" transition-colors hover:text-[#8354E0]" width={18} height={18} />
+      <div className=" bg-[#252525] text-[#ADAAAA] flex items-center justify-center gap-4 p-3  ">
+        <PlusBox onClick={addLayer} className="cursor-pointer transition-colors hover:text-[#8354E0]" width={18} height={18} />
 
         <svg 
           onClick={deleteActiveLayer}
-          className={`transition-colors hover:text-red-500 ${layers.length <= 1 ? 'opacity-30 cursor-not-allowed' : ''}`} 
+          className={`transition-colors cursor-pointer hover:text-red-500 ${layers.length <= 1 ? 'opacity-30 cursor-not-allowed' : ''}`} 
           width="18" 
           height="18" 
           viewBox="0 0 24 24" 
