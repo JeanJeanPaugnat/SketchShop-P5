@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Canvas } from "./Canvas";
 import ToolBox from "./ToolBox";
 import SideBarLayer from "./SideBarLayer";
 import ContextualBar from "./ContextualBar";
-import ToolSettings from "./ToolSettings";
 import type { Tool, Layer, DrawingSettings } from "../types";
 
 export default function PinZoomPinch () {
@@ -76,7 +75,17 @@ export default function PinZoomPinch () {
     setApplyFilter({ type, timestamp: Date.now() });
   };
 
+  const handleActiveLayerOpacityChange = (opacity: number) => {
+    setLayers(layers.map(l => l.isActive ? { ...l, opacity } : l));
+  };
+
   return (
+    <>
+    <ContextualBar 
+      activeTool={activeTool}
+      settings={settings}
+      setSettings={setSettings}
+    />
     <div className="flex-1 flex bg-gray-100 overflow-hidden relative">
           <TransformWrapper
             initialScale={0.45}
@@ -114,13 +123,9 @@ export default function PinZoomPinch () {
                 </div>
             </TransformComponent>
           </TransformWrapper>
-          <ToolBox activeTool={activeTool} setActiveTool={setActiveTool} />
+          <ToolBox  activeTool={activeTool} setActiveTool={setActiveTool} settings={settings} setSettings={setSettings} />
           
-          <ContextualBar 
-            activeTool={activeTool}
-            settings={settings}
-            setSettings={setSettings}
-          />
+
           
           {/* <ToolSettings 
             settings={settings} 
@@ -130,13 +135,17 @@ export default function PinZoomPinch () {
 
           <SideBarLayer 
             layers={layers} 
+            setLayers={setLayers}
             toggleVisibility={toggleVisibility} 
             toggleLock={toggleLock} 
             setActiveLayer={setActiveLayer}
             addLayer={addLayer}
             deleteActiveLayer={deleteActiveLayer}
+            onApplyFilter={handleApplyFilter}
+            onActiveLayerOpacityChange={handleActiveLayerOpacityChange}
           />
     </div>
+    </>
   );
 };
 

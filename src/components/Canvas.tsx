@@ -1,4 +1,3 @@
-import * as React from "react";
 import { P5Canvas } from "@p5-wrapper/react";
 import type { Sketch } from "@p5-wrapper/react";
 import type { Tool, Layer, DrawingSettings } from '../types';
