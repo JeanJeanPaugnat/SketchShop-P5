@@ -1,10 +1,18 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import Workshop from './pages/Workshop'
+import Workshop from './layout/Workshop'
+import { BrowserRouter, Routes, Route } from 'react-router'
+import CreateFile from './layout/CreateFile'
+
+
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
-    <Workshop />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Workshop />} />
+        <Route path="/createfile" element={<CreateFile />} />
+      </Routes>
+    </BrowserRouter>
   // </StrictMode>,
 )

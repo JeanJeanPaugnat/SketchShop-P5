@@ -1,46 +1,35 @@
-import LayerCard from "./ui/LayerCard";
-import type { Layer } from "../types";
+import LayerCard from "../../shared/components/LayerCard";
 import { PlusBox } from 'pixelarticons/react';
 import { Reorder } from "motion/react";
+import { useEditorStore } from "../../store/useEditorStore";
 
-interface SideBarLayerProps {
-  layers: Layer[];
-  setLayers: (layers: Layer[]) => void;
-  toggleVisibility: (id: string) => void;
-  toggleLock: (id: string) => void;
-  setActiveLayer: (id: string) => void;
-  addLayer: () => void;
-  deleteActiveLayer: () => void;
-  onApplyFilter: (type: 'threshold' | 'pixelate' | 'ascii') => void;
-  onActiveLayerOpacityChange: (opacity: number) => void;
-}
+export default function SideBarLayer() {
+  const { 
+    layers, 
+    setLayers, 
+    toggleVisibility, 
+    toggleLock, 
+    setActiveLayer, 
+    addLayer, 
+    deleteActiveLayer,
+    triggerFilter,
+    updateActiveLayerOpacity
+  } = useEditorStore();
 
-export default function SideBarLayer({ 
-  layers, 
-  setLayers,
-  toggleVisibility, 
-  toggleLock, 
-  setActiveLayer,
-  addLayer,
-  deleteActiveLayer,
-  onApplyFilter,
-  onActiveLayerOpacityChange
-}: SideBarLayerProps) {
   const reversedLayers = [...layers].reverse();
   const activeLayer = layers.find(l => l.isActive);
 
-  const handleReorder = (newOrder: Layer[]) => {
+  const handleReorder = (newOrder: any[]) => {
     setLayers([...newOrder].reverse());
   };
 
   return (
-    <aside className="flex flex-col right-0 absolute h-fill-available m-6 bg-[#171717] z-10 ">
+    <aside className="flex flex-col right-0 absolute h-fill-available m-6 bg-[#171717] z-10">
       {/* Layer Settings (Filter & Opacity) */}
-      <div className="flex flex-row justify-between px-4 py-2">
-        <div className="flex flex-col gap-1">
+      <div className="flex flex-row justify-between p-4">
           <select 
-            onChange={(e) => e.target.value !== "none" && onApplyFilter(e.target.value as any)}
-            className="bg-[#2A2A2A] text-white text-xs py-1 px-2 w-32 h-8 border-none outline-none cursor-pointer"
+            onChange={(e) => e.target.value !== "none" && triggerFilter(e.target.value as any)}
+            className="bg-[#2A2A2A] text-white text-xs py-1 px-2 border-none outline-none cursor-pointer"
             defaultValue="none"
           >
             <option value="none">Normal</option>
@@ -48,7 +37,6 @@ export default function SideBarLayer({
             <option value="pixelate">Pixelate</option>
             <option value="ascii">ASCII</option>
           </select>
-        </div>
 
         <div className="flex flex-col gap-1">
           <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase">
@@ -60,7 +48,7 @@ export default function SideBarLayer({
             min="0" 
             max="100" 
             value={activeLayer?.opacity ?? 100}
-            onChange={(e) => onActiveLayerOpacityChange(parseInt(e.target.value))}
+            onChange={(e) => updateActiveLayerOpacity(parseInt(e.target.value))}
             className="h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-violet-500"
           />
         </div>

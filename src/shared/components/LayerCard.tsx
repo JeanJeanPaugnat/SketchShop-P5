@@ -1,4 +1,3 @@
-import React from 'react';
 import { Eye, EyeOff, Lock, Unlock } from 'pixelarticons/react';
 
 interface LayerCardProps {
@@ -31,6 +30,7 @@ export default function LayerCard({
         isActive ? 'bg-[#8354E0] text-white' : 'bg-transparent text-gray-400 hover:bg-[#2A2A2A]'
       }`}
     >
+
       {/* Visibility Toggle */}
       <button
         onClick={(e) => {
@@ -43,7 +43,7 @@ export default function LayerCard({
       </button>
 
       {/* Thumbnail */}
-      <div className={`w-10 h-10 bg-[#1A1A1A] border flex-shrink-0 overflow-hidden ${
+      <div className={`w-10 h-10 bg-[#1A1A1A] border shrink-0 overflow-hidden ${
         isActive ? 'border-purple-400' : 'border-gray-700'
       }`}>
         {thumbnail ? (

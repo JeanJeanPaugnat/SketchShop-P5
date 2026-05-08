@@ -1,11 +1,14 @@
 import { P5Canvas } from "@p5-wrapper/react";
 import type { Sketch } from "@p5-wrapper/react";
-import type { Tool, Layer, DrawingSettings } from '../types';
+import type { Tool, Layer, DrawingSettings } from '../../core/types';
+import { useEditorStore } from "../../store/useEditorStore";
+import { applyThreshold, applyPixelate, applyASCII } from "./filters";
 
 interface CanvasProps {
   activeTool: Tool;
   layers: Layer[];
   settings: DrawingSettings;
+  canvasDimensions: { width: number; height: number };
   applyFilter?: { type: 'threshold' | 'pixelate' | 'ascii', timestamp: number };
   [key: string]: any;
 }
@@ -13,6 +16,7 @@ interface CanvasProps {
 const sketch: Sketch<CanvasProps> = (p5) => {
   let activeTool: Tool = 'brush';
   let layersData: Layer[] = [];
+  let canvasDimensions: { width: number; height: number } = { width: 1200, height: 800 };
   let settingsData: DrawingSettings = {
     color: '#000000',
     brushSize: 5,
@@ -29,7 +33,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   const SPEED_HISTORY_SIZE = 5;
   let lastFilterTimestamp = 0;
 
-  // Track transformed coordinates to fix the offset issue
   let localMouse = { x: 0, y: 0 };
   let prevLocalMouse = { x: 0, y: 0 };
 
@@ -38,11 +41,8 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     const canvasElement = (p5 as any).canvas;
     if (canvasElement) {
       const rect = canvasElement.getBoundingClientRect();
-      
-      // Map window coordinates (winMouseX) to internal canvas coordinates (1200x800)
-      const scaleX = 1200 / rect.width;
-      const scaleY = 800 / rect.height;
-      
+      const scaleX = canvasDimensions.width / rect.width;
+      const scaleY = canvasDimensions.height / rect.height;
       localMouse.x = (p5.winMouseX - rect.left) * scaleX;
       localMouse.y = (p5.winMouseY - rect.top) * scaleY;
     }
@@ -52,30 +52,48 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     activeTool = props.activeTool;
     layersData = props.layers;
     settingsData = props.settings;
+    
+    if (props.canvasDimensions.width !== canvasDimensions.width || props.canvasDimensions.height !== canvasDimensions.height) {
+        canvasDimensions = props.canvasDimensions;
+        p5.resizeCanvas(canvasDimensions.width, canvasDimensions.height);
+        layerGraphics.forEach((g) => g.resizeCanvas(canvasDimensions.width, canvasDimensions.height));
+    }
 
-    // Create graphics for new layers
     layersData.forEach(layer => {
       if (!layerGraphics.has(layer.id)) {
-        const g = p5.createGraphics(1200, 800);
+        const g = p5.createGraphics(canvasDimensions.width, canvasDimensions.height);
         layerGraphics.set(layer.id, g);
       }
     });
 
-    // Handle filter application
     if (props.applyFilter && props.applyFilter.timestamp > lastFilterTimestamp) {
       lastFilterTimestamp = props.applyFilter.timestamp;
       const activeLayer = layersData.find(l => l.isActive);
       if (activeLayer) {
         const g = layerGraphics.get(activeLayer.id);
         if (g) {
-          applyFilter(g, props.applyFilter.type);
+          applyFilterEffect(g, props.applyFilter.type);
         }
       }
     }
   };
 
+  function applyFilterEffect(g: any, type: string) {
+    switch (type) {
+      case 'threshold':
+        applyThreshold(g, settingsData);
+        break;
+      case 'pixelate':
+        applyPixelate(g, settingsData);
+        break;
+      case 'ascii':
+        applyASCII(g, settingsData);
+        break;
+    }
+  }
+
   p5.setup = () => {
-    const canvas = p5.createCanvas(1200, 800);
+    const canvas = p5.createCanvas(canvasDimensions.width, canvasDimensions.height);
     p5.background(255);
     canvas.drop(handleFileDrop);
   };
@@ -99,7 +117,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     p5.background(255);
     updateCursor();
 
-    // Render layers in order
     layersData.forEach(layer => {
       const g = layerGraphics.get(layer.id);
       if (g && layer.isVisible) {
@@ -108,7 +125,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
       }
     });
 
-    // Drawing logic
     if (p5.mouseIsPressed) {
       const activeLayer = layersData.find(l => l.isActive);
       if (activeLayer && !activeLayer.isLocked) {
@@ -119,7 +135,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
       }
     }
 
-    // Preview for shapes
     if (activeTool === 'square' && rectangleStart && p5.mouseIsPressed) {
       p5.push();
       p5.stroke(settingsData.color);
@@ -209,7 +224,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     }
   }
 
-
   function calculateDynamicStrokeWeight(x: number, y: number, px: number, py: number) {
     const dx = x - px;
     const dy = y - py;
@@ -238,106 +252,19 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     
     return Math.max(minWeight, dynamicWeight);
   }
-
-  function applyFilter(g: any, type: string) {
-    const ctx = g.canvas.getContext('2d');
-    const w = g.canvas.width;
-    const h = g.canvas.height;
-    const imageData = ctx.getImageData(0, 0, w, h);
-    const data = imageData.data;
-
-    if (type === 'threshold') {
-      const threshold = settingsData.threshold;
-      for (let i = 0; i < data.length; i += 4) {
-        let r = data[i];
-        let g = data[i + 1];
-        let b = data[i + 2];
-        let gray = 0.299 * r + 0.587 * g + 0.114 * b;
-        let val = gray < threshold ? 0 : 255;
-        data[i] = val;
-        data[i + 1] = val;
-        data[i + 2] = val;
-      }
-      ctx.putImageData(imageData, 0, 0);
-    } else if (type === 'pixelate') {
-      const pixelSize = settingsData.pixelSize;
-      for (let y = 0; y < h; y += pixelSize) {
-        for (let x = 0; x < w; x += pixelSize) {
-          let red = 0, green = 0, blue = 0, alpha = 0, count = 0;
-          for (let py = 0; py < pixelSize; py++) {
-            for (let px = 0; px < pixelSize; px++) {
-              let posX = x + px;
-              let posY = y + py;
-              if (posX < w && posY < h) {
-                let index = (posY * w + posX) * 4;
-                if (data[index + 3] > 0) {
-                  red += data[index];
-                  green += data[index + 1];
-                  blue += data[index + 2];
-                  alpha += data[index + 3];
-                  count++;
-                }
-              }
-            }
-          }
-          if (count > 0) {
-            red /= count; green /= count; blue /= count; alpha /= count;
-            for (let py = 0; py < pixelSize; py++) {
-              for (let px = 0; px < pixelSize; px++) {
-                let posX = x + px;
-                let posY = y + py;
-                if (posX < w && posY < h) {
-                  let index = (posY * w + posX) * 4;
-                  data[index] = red;
-                  data[index + 1] = green;
-                  data[index + 2] = blue;
-                  data[index + 3] = alpha;
-                }
-              }
-            }
-          }
-        }
-      }
-      ctx.putImageData(imageData, 0, 0);
-    } else if (type === 'ascii') {
-      const scale = settingsData.asciiScale;
-      const densityChars = [' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'];
-      ctx.save();
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = 'black';
-      ctx.font = `${scale}px monospace`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      for (let y = 0; y < h; y += scale) {
-        for (let x = 0; x < w; x += scale) {
-          let red = 0, green = 0, blue = 0, count = 0;
-          for (let py = 0; py < scale; py++) {
-            for (let px = 0; px < scale; px++) {
-              let posX = x + px;
-              let posY = y + py;
-              if (posX < w && posY < h) {
-                let index = (posY * w + posX) * 4;
-                red += data[index];
-                green += data[index + 1];
-                blue += data[index + 2];
-                count++;
-              }
-            }
-          }
-          red /= count; green /= count; blue /= count;
-          const brightness = 0.299 * red + 0.587 * green + 0.114 * blue;
-          let charIndex = Math.floor((brightness / 255) * (densityChars.length - 1));
-          charIndex = densityChars.length - 1 - charIndex;
-          ctx.fillText(densityChars[charIndex], x + scale / 2, y + scale / 2);
-        }
-      }
-      ctx.restore();
-    }
-  }
 };
 
-export function Canvas({ activeTool, layers, settings, applyFilter }: CanvasProps) {
-  return <P5Canvas sketch={sketch} activeTool={activeTool} layers={layers} settings={settings} applyFilter={applyFilter} />;
+export function Canvas() {
+  const { activeTool, layers, settings, applyFilter, canvasDimensions } = useEditorStore();
+  
+  return (
+    <P5Canvas 
+      sketch={sketch} 
+      activeTool={activeTool} 
+      layers={layers} 
+      settings={settings} 
+      applyFilter={applyFilter} 
+      canvasDimensions={canvasDimensions}
+    />
+  );
 }
