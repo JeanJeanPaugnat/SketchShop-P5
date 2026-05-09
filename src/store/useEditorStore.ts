@@ -29,6 +29,12 @@ interface EditorState {
   // Filter State
   applyFilter: { type: 'threshold' | 'pixelate' | 'ascii', timestamp: number } | undefined;
   triggerFilter: (type: 'threshold' | 'pixelate' | 'ascii') => void;
+
+  // Export & Persistence State
+  previewUrl: string | null;
+  setPreviewUrl: (url: string | null) => void;
+  layerData: Map<string, string>; // Maps layer ID to data URL
+  setLayerData: (id: string, dataUrl: string) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -121,4 +127,14 @@ export const useEditorStore = create<EditorState>((set) => ({
   // Filter State
   applyFilter: undefined,
   triggerFilter: (type) => set({ applyFilter: { type, timestamp: Date.now() } }),
+
+  // Export & Persistence State
+  previewUrl: null,
+  setPreviewUrl: (previewUrl) => set({ previewUrl }),
+  layerData: new Map(),
+  setLayerData: (id, dataUrl) => set((state) => {
+    const newLayerData = new Map(state.layerData);
+    newLayerData.set(id, dataUrl);
+    return { layerData: newLayerData };
+  }),
 }));

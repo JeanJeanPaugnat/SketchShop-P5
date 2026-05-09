@@ -3,6 +3,7 @@ import type { Sketch } from "@p5-wrapper/react";
 import type { Tool, Layer, DrawingSettings } from '../../core/types';
 import { useEditorStore } from "../../store/useEditorStore";
 import { applyThreshold, applyPixelate, applyASCII } from "./filters";
+import { useEffect, useRef } from "react";
 
 interface CanvasProps {
   activeTool: Tool;
@@ -10,6 +11,9 @@ interface CanvasProps {
   settings: DrawingSettings;
   canvasDimensions: { width: number; height: number };
   applyFilter?: { type: 'threshold' | 'pixelate' | 'ascii', timestamp: number };
+  layerData?: Map<string, string>;
+  onUpdateCanvas?: (dataUrl: string) => void;
+  onUpdateLayer?: (id: string, dataUrl: string) => void;
   [key: string]: any;
 }
 
@@ -32,6 +36,10 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   let speedHistory: number[] = [];
   const SPEED_HISTORY_SIZE = 5;
   let lastFilterTimestamp = 0;
+  let onUpdateCanvas: ((dataUrl: string) => void) | undefined;
+  let onUpdateLayer: ((id: string, dataUrl: string) => void) | undefined;
+  let lastSyncTime = 0;
+  let needsSync = false;
 
   let localMouse = { x: 0, y: 0 };
   let prevLocalMouse = { x: 0, y: 0 };
@@ -52,6 +60,8 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     activeTool = props.activeTool;
     layersData = props.layers;
     settingsData = props.settings;
+    onUpdateCanvas = props.onUpdateCanvas;
+    onUpdateLayer = props.onUpdateLayer;
     
     if (props.canvasDimensions.width !== canvasDimensions.width || props.canvasDimensions.height !== canvasDimensions.height) {
         canvasDimensions = props.canvasDimensions;
@@ -62,6 +72,15 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     layersData.forEach(layer => {
       if (!layerGraphics.has(layer.id)) {
         const g = p5.createGraphics(canvasDimensions.width, canvasDimensions.height);
+        // Restore from store if data exists
+        if (props.layerData && props.layerData.has(layer.id)) {
+          const dataUrl = props.layerData.get(layer.id);
+          if (dataUrl) {
+            p5.loadImage(dataUrl, (img) => {
+              g.image(img, 0, 0);
+            });
+          }
+        }
         layerGraphics.set(layer.id, g);
       }
     });
@@ -73,6 +92,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
         const g = layerGraphics.get(activeLayer.id);
         if (g) {
           applyFilterEffect(g, props.applyFilter.type);
+          needsSync = true;
         }
       }
     }
@@ -106,6 +126,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
           const g = layerGraphics.get(activeLayer.id);
           if (g) {
             g.image(img, 0, 0);
+            needsSync = true;
           }
         }
       });
@@ -131,6 +152,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
         const g = layerGraphics.get(activeLayer.id);
         if (g) {
           handleDrawing(g);
+          needsSync = true;
         }
       }
     }
@@ -148,7 +170,27 @@ const sketch: Sketch<CanvasProps> = (p5) => {
       );
       p5.pop();
     }
+
+    // Periodically sync canvas to store for preview
+    if (needsSync && p5.millis() - lastSyncTime > 500) {
+        syncToStore();
+    }
   };
+
+  function syncToStore() {
+    if (onUpdateCanvas) {
+        onUpdateCanvas((p5 as any).canvas.toDataURL());
+    }
+    const activeLayer = layersData.find(l => l.isActive);
+    if (activeLayer && onUpdateLayer) {
+        const g = layerGraphics.get(activeLayer.id);
+        if (g) {
+            onUpdateLayer(activeLayer.id, (g as any).canvas.toDataURL());
+        }
+    }
+    lastSyncTime = p5.millis();
+    needsSync = false;
+  }
 
   p5.mousePressed = () => {
     updateLocalMouse();
@@ -174,6 +216,8 @@ const sketch: Sketch<CanvasProps> = (p5) => {
             localMouse.y - rectangleStart.y
           );
           g.pop();
+          needsSync = true;
+          syncToStore();
         }
       }
       rectangleStart = null;
@@ -255,8 +299,13 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 };
 
 export function Canvas() {
-  const { activeTool, layers, settings, applyFilter, canvasDimensions } = useEditorStore();
+  const { activeTool, layers, settings, applyFilter, canvasDimensions, setPreviewUrl, layerData, setLayerData } = useEditorStore();
   
+  // We don't have direct access to the p5 instance here, 
+  // but the sketch itself handles periodic syncing.
+  // To ensure a sync on unmount, we'd need to expose a way from the sketch.
+  // For now, the 500ms periodic sync + sync on mouseRelease should be enough.
+
   return (
     <P5Canvas 
       sketch={sketch} 
@@ -265,6 +314,9 @@ export function Canvas() {
       settings={settings} 
       applyFilter={applyFilter} 
       canvasDimensions={canvasDimensions}
+      layerData={layerData}
+      onUpdateCanvas={setPreviewUrl}
+      onUpdateLayer={setLayerData}
     />
   );
 }
