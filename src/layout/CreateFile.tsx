@@ -5,10 +5,10 @@ import { useEditorStore } from "../store/useEditorStore";
 const PRESETS = [
     {
         id: 'print-a4',
-        name: 'Print A4',
+        name: 'A4',
         width: 2480,
         height: 3508,
-        description: '210 × 297 mm • 300 DPI',
+        description: '210 × 297 mm',
         icon: (
             <div className="w-16 h-20 bg-gray-800 rounded flex items-center justify-center border border-gray-700">
                 <span className="text-[10px] font-bold text-gray-500">A4</span>
@@ -17,10 +17,10 @@ const PRESETS = [
     },
     {
         id: 'web-hd',
-        name: 'Web HD',
+        name: 'Thumbnail',
         width: 1920,
         height: 1080,
-        description: '1920 × 1080 px • 72 DPI',
+        description: '1920 × 1080 px',
         icon: (
             <div className="w-24 h-14 bg-gray-800 rounded flex items-center justify-center border border-gray-700">
                 <span className="text-[10px] font-bold text-gray-500">1080P</span>
@@ -32,7 +32,7 @@ const PRESETS = [
         name: 'Mobile',
         width: 1170,
         height: 2532,
-        description: '1170 × 2532 px • Portrait',
+        description: '1170 × 2532 px',
         icon: (
             <div className="w-10 h-20 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 relative">
                 <div className="w-1 h-1 bg-gray-700 rounded-full absolute top-2"></div>
@@ -63,7 +63,7 @@ function CreateFileContent() {
                         <button
                             key={preset.id}
                             onClick={() => handleSelectPreset(preset.width, preset.height)}
-                            className="bg-[#111111] border border-gray-900 rounded-xl p-8 flex flex-col items-center justify-between hover:border-purple-500/50 hover:bg-[#151515] transition-all group text-center aspect-square md:aspect-auto md:h-80"
+                            className="bg-[#111111] border border-[#111111] p-8 flex flex-col items-center justify-between hover:border hover:border-purple-500/50 hover:bg-[#151515] transition-all group text-center aspect-square md:aspect-auto md:h-80"
                         >
                             <div className="flex-1 flex items-center justify-center">
                                 {preset.icon}
@@ -76,18 +76,16 @@ function CreateFileContent() {
                     ))}
 
                     <button
-                        className="bg-[#1a1a24] border border-purple-500/20 border-dashed rounded-xl p-8 flex flex-col items-center justify-between hover:border-purple-500/50 hover:bg-[#1e1e2d] transition-all group text-center md:h-80"
+                        className="bg-[#1a1a24] border-2 border-purple-500/20 border-dashed p-8 flex flex-col items-center justify-between hover:border-purple-500/50 hover:bg-[#1e1e2d] transition-all group text-center md:h-80"
                     >
                         <div className="flex-1 flex items-center justify-center">
-                            <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                <svg width="42" height="42" viewBox="0 0 19 19" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className="text-purple-500">
+                                    <path d="M5 3H14V0H16V3H19V5H16V10H14V5H5V14H10V16H5V19H3V16H0V14H3V5H0V3H3V0H5V3ZM16 14H18V16H16V18H14V16H12V14H14V12H16V14Z" fill="currentColor"/>
                                 </svg>
-                            </div>
                         </div>
                         <div className="mt-6">
-                            <h3 className="font-bold text-lg mb-1 text-purple-300">Create your own size</h3>
-                            <p className="text-gray-500 text-xs uppercase tracking-widest">PSD, AI, SKP, PNG, JPG</p>
+                            <h3 className="font-bold text-lg mb-1 text-purple-300">Custom size</h3>
+                            <p className="text-gray-500 text-xs">Create your own dimensions</p>
                         </div>
                     </button>
                 </div>
