@@ -10,8 +10,8 @@ const PRESETS = [
         height: 3508,
         description: '210 × 297 mm',
         icon: (
-            <div className="w-16 h-20 bg-gray-800 rounded flex items-center justify-center border border-gray-700">
-                <span className="text-[10px] font-bold text-gray-500">A4</span>
+            <div className="w-16 h-20 bg-[#1F1D26] rounded flex items-center justify-center border border-[#4C4B52]">
+                <span className="text-[10px] font-bold text-[#4C4B52]">A4</span>
             </div>
         )
     },
@@ -22,8 +22,8 @@ const PRESETS = [
         height: 1080,
         description: '1920 × 1080 px',
         icon: (
-            <div className="w-24 h-14 bg-gray-800 rounded flex items-center justify-center border border-gray-700">
-                <span className="text-[10px] font-bold text-gray-500">1080P</span>
+            <div className="w-24 h-14 bg-[#1F1D26] rounded flex items-center justify-center border border-[#4C4B52]">
+                <span className="text-[10px] font-bold text-[#4C4B52]">1080P</span>
             </div>
         )
     },
@@ -34,8 +34,8 @@ const PRESETS = [
         height: 2532,
         description: '1170 × 2532 px',
         icon: (
-            <div className="w-10 h-20 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 relative">
-                <div className="w-1 h-1 bg-gray-700 rounded-full absolute top-2"></div>
+            <div className="w-10 h-20 bg-[#1F1D26] rounded-lg flex items-center justify-center border border-[#4C4B52] relative">
+                <div className="w-1 h-1 bg-[#4C4B52] rounded-full absolute top-2"></div>
             </div>
         )
     }

@@ -66,7 +66,7 @@ export default function ExportPage() {
                 {/* Left Side: Settings */}
                 <div className="w-[320px] flex flex-col gap-6 shrink-0 overflow-y-auto pr-2">
                     {/* Export Settings */}
-                    <div className="bg-[#171717] p-6 flex flex-col gap-6 rounded-xl border border-white/5">
+                    <div className="bg-[#171717] p-6 flex flex-col gap-6 border border-white/5">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-bold font-['Manrope'] tracking-tight">Export Settings</h2>
                             <Settings2 width={18} />
@@ -77,14 +77,14 @@ export default function ExportPage() {
                             <label className="text-[10px] text-[#adaaaa] tracking-widest uppercase">File Format</label>
                             <div 
                                 onClick={() => setIsFormatOpen(!isFormatOpen)}
-                                className="bg-[#262626] rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-[#333] transition-colors border border-white/5"
+                                className="bg-[#262626] p-3 flex items-center justify-between cursor-pointer hover:bg-[#333] transition-colors border border-white/5"
                             >
                                 <span className="text-sm">{currentFormatLabel}</span>
                                 <ChevronDown width={16} className={`transition-transform ${isFormatOpen ? 'rotate-180' : ''}`} />
                             </div>
                             
                             {isFormatOpen && (
-                                <div className="absolute top-full left-0 right-0 mt-2 bg-[#262626] border border-white/10 rounded-lg overflow-hidden z-50 shadow-2xl">
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-[#262626] border border-white/10 overflow-hidden z-50 shadow-2xl">
                                     {formats.map((f) => (
                                         <div 
                                             key={f.value}
@@ -105,7 +105,7 @@ export default function ExportPage() {
                         <div className="flex gap-2">
                                 <div className="flex flex-col gap-1 flex-1">
                                     <span className="text-sm text-[#adaaaa]">Width</span>
-                                    <div className="bg-[#262626] p-3 w-full text-sm text-white/50 border border-white/5 rounded-lg">
+                                    <div className="bg-[#262626] p-3 w-full text-sm text-white/50 border border-white/5">
                                         {canvasDimensions.width}
                                     </div>
                                 </div>
@@ -115,7 +115,7 @@ export default function ExportPage() {
 
                                 <div className="flex flex-col gap-1 flex-1">
                                     <span className="text-sm text-[#adaaaa]">Height</span>
-                                    <div className="bg-[#262626] p-3 w-full text-sm text-white/50 border border-white/5 rounded-lg">
+                                    <div className="bg-[#262626] p-3 w-full text-sm text-white/50 border border-white/5">
                                         {canvasDimensions.height}
                                     </div>
                                 </div>
@@ -125,7 +125,7 @@ export default function ExportPage() {
                         <div className="flex flex-col gap-3">
                             <div className="flex items-center justify-between">
                                 <label className="text-sm text-[#adaaaa] tracking-widest uppercase">Quality</label>
-                                <span className="text-xs font-bold text-[#00e3fd]">{quality}%</span>
+                                <span className="text-xs font-bold text-[#8354E0]">{quality}%</span>
                             </div>
                             <input 
                                 type="range" 
@@ -133,7 +133,7 @@ export default function ExportPage() {
                                 max="100" 
                                 value={quality} 
                                 onChange={(e) => setQuality(parseInt(e.target.value))}
-                                className="w-full h-1 bg-[#262626] rounded-full appearance-none cursor-pointer accent-[#00e3fd]"
+                                className="w-full h-1 bg-[#262626] rounded-full appearance-none cursor-pointer accent-[#8354E0]"
                             />
                             <div className="flex justify-between text-[10px] text-[#767575]">
                                 <span>Speed</span>
@@ -147,7 +147,7 @@ export default function ExportPage() {
                 {/* Right Side: Preview */}
                 <div className="flex-1 flex flex-col gap-6 relative min-w-0">
                     {/* Main Preview Area */}
-                    <div className="flex-1 bg-[#262626]/60 backdrop-blur-[10px] rounded-xl overflow-hidden relative flex items-center justify-center p-8 border border-white/5">
+                    <div className="flex-1 bg-[#262626]/60 backdrop-blur-[10px] overflow-hidden relative flex items-center justify-center p-8 border border-white/5">
                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
                         
                         {previewUrl ? (
@@ -170,7 +170,7 @@ export default function ExportPage() {
                         {/* Bottom Overlay Badge */}
                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2 flex items-center gap-4">
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-[#00e3fd]"></div>
+                                <div className="w-2 h-2 rounded-full bg-[#8354E0]"></div>
                                 <span className="text-[10px] font-medium text-white/80">{canvasDimensions.width} x {canvasDimensions.height}</span>
                             </div>
                             <div className="w-px h-4 bg-white/20"></div>
@@ -179,7 +179,7 @@ export default function ExportPage() {
                     </div>
 
                     {/* Bottom Action Bar */}
-                    <div className="bg-[#262626]/60 backdrop-blur-[10px] rounded-xl p-4 flex items-center justify-between shrink-0 border border-white/5">
+                    <div className="bg-[#262626]/60 backdrop-blur-[10px] p-4 flex items-center justify-between shrink-0 border border-white/5">
                         <div className="flex items-center gap-6">
                             <div className="flex flex-col gap-1">
                                 <span className="text-[10px] text-[#adaaaa] tracking-tight uppercase">Estimated File Size</span>
@@ -195,14 +195,14 @@ export default function ExportPage() {
                         <div className="flex items-center gap-4">
                             <button 
                                 onClick={() => navigate('/')}
-                                className="px-6 py-3 border border-white/10 rounded-lg text-sm font-bold hover:bg-white/5 transition-colors"
+                                className="px-6 py-3 border border-white/10  text-sm font-bold hover:bg-white/5 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button 
                                 onClick={handleExport}
                                 disabled={!previewUrl}
-                                className="bg-[#b6a0ff] text-[#340090] px-8 py-3 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-[#a38cff] transition-all shadow-[0_4px_14px_rgba(182,160,255,0.25)] hover:shadow-[0_6px_20px_rgba(182,160,255,0.4)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                className="bg-[#8354E0] text-white px-8 py-3 text-sm font-bold flex items-center gap-2 hover:bg-[#a38cff] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                             >
                                 Export Now
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
