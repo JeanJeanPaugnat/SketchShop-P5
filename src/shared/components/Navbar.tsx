@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import Button from "./Button"
 import { motion } from "motion/react"
-import { AvatarCircle, SettingsCog2 } from 'pixelarticons/react'
+import { AvatarCircle, SettingsCog2, SettingsCog } from 'pixelarticons/react'
 import logoLineSketch from "../../assets/logo-line-Sketch.svg"
 import { useNavigate, useLocation, Link } from "react-router"
 
@@ -62,7 +62,10 @@ export default function Navbar() {
 
         <div className="flex items-center gap-3.5">
           <AvatarCircle width={24} className="text-violet-500" />
-          <SettingsCog2 width={24} className="text-gray-300" />
+          <svg width="20" height="20" viewBox="0 0 22 22" className="text-gray-300" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 19H6V17H10V20H12V17H16V19H14V22H8V19H6V21H1V16H3V19ZM21 21H16V19H19V16H21V21ZM5 10H2V12H5V16H3V14H0V8H3V6H5V10ZM19 8H22V14H19V16H17V12H20V10H17V6H19V8ZM13 15H9V13H13V15ZM9 13H7V9H9V13ZM15 13H13V9H15V13ZM13 9H9V7H13V9ZM6 3H3V6H1V1H6V3ZM14 3H16V1H21V6H19V3H16V5H12V2H10V5H6V3H8V0H14V3Z" fill="currentColor"/>
+          </svg>
+
         </div>
       </div>
     </nav>
