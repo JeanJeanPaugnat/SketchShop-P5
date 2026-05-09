@@ -3,6 +3,7 @@ import './index.css'
 import Workshop from './layout/Workshop'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import CreateFile from './layout/CreateFile'
+import ExportPage from './layout/ExportPage'
 
 
 
@@ -12,6 +13,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<Workshop />} />
         <Route path="/createfile" element={<CreateFile />} />
+        <Route path="/export" element={<ExportPage />} />
       </Routes>
     </BrowserRouter>
   // </StrictMode>,

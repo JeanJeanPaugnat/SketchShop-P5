@@ -8,7 +8,7 @@ import { useNavigate, useLocation, Link } from "react-router"
 const NAV_ITEMS = [
   { label: "FILE", path: "/createfile" },
   { label: "EDIT", path: "/" },
-  { label: "VIEW", path: "/" }
+  { label: "EXPORT", path: "/export" }
 ] as const
 
 
