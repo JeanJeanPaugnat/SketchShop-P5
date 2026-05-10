@@ -3,13 +3,13 @@ import type { Sketch } from "@p5-wrapper/react";
 import type { Tool, Layer, DrawingSettings } from '../../core/types';
 import { useEditorStore } from "../../store/useEditorStore";
 import { applyThreshold, applyPixelate, applyASCII } from "./filters";
-import { useEffect, useRef } from "react";
 
 interface CanvasProps {
   activeTool: Tool;
   layers: Layer[];
   settings: DrawingSettings;
   canvasDimensions: { width: number; height: number };
+  canvasBackground: string;
   applyFilter?: { type: 'threshold' | 'pixelate' | 'ascii', timestamp: number };
   layerData?: Map<string, string>;
   onUpdateCanvas?: (dataUrl: string) => void;
@@ -21,6 +21,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   let activeTool: Tool = 'brush';
   let layersData: Layer[] = [];
   let canvasDimensions: { width: number; height: number } = { width: 1200, height: 800 };
+  let canvasBackground: string = '#ffffff';
   let settingsData: DrawingSettings = {
     color: '#000000',
     brushSize: 5,
@@ -62,6 +63,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     settingsData = props.settings;
     onUpdateCanvas = props.onUpdateCanvas;
     onUpdateLayer = props.onUpdateLayer;
+    canvasBackground = props.canvasBackground;
     
     if (props.canvasDimensions.width !== canvasDimensions.width || props.canvasDimensions.height !== canvasDimensions.height) {
         canvasDimensions = props.canvasDimensions;
@@ -114,7 +116,11 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 
   p5.setup = () => {
     const canvas = p5.createCanvas(canvasDimensions.width, canvasDimensions.height);
-    p5.background(255);
+    if (canvasBackground === 'transparent') {
+        p5.clear();
+    } else {
+        p5.background(canvasBackground);
+    }
     canvas.drop(handleFileDrop);
   };
 
@@ -135,7 +141,11 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 
   p5.draw = () => {
     updateLocalMouse();
-    p5.background(255);
+    if (canvasBackground === 'transparent') {
+        p5.clear();
+    } else {
+        p5.background(canvasBackground);
+    }
     updateCursor();
 
     layersData.forEach(layer => {
@@ -299,7 +309,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 };
 
 export function Canvas() {
-  const { activeTool, layers, settings, applyFilter, canvasDimensions, setPreviewUrl, layerData, setLayerData } = useEditorStore();
+  const { activeTool, layers, settings, applyFilter, canvasDimensions, canvasBackground, setPreviewUrl, layerData, setLayerData } = useEditorStore();
   
   // We don't have direct access to the p5 instance here, 
   // but the sketch itself handles periodic syncing.
@@ -314,6 +324,7 @@ export function Canvas() {
       settings={settings} 
       applyFilter={applyFilter} 
       canvasDimensions={canvasDimensions}
+      canvasBackground={canvasBackground}
       layerData={layerData}
       onUpdateCanvas={setPreviewUrl}
       onUpdateLayer={setLayerData}
