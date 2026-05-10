@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import Button from "./Button"
 import { motion } from "motion/react"
-import { AvatarCircle, SettingsCog2, SettingsCog } from 'pixelarticons/react'
+import { AvatarCircle } from 'pixelarticons/react'
 import logoLineSketch from "../../assets/logo-line-Sketch.svg"
 import { useNavigate, useLocation, Link } from "react-router"
 

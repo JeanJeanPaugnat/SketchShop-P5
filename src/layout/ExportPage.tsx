@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import Navbar from '../shared/components/Navbar';
 import { useEditorStore } from '../store/useEditorStore';
-import { Link, Settings2, ChevronDown } from 'pixelarticons/react';
+import { Link, Settings2, ChevronDown, Download } from 'pixelarticons/react';
 
 type ExportFormat = 'png' | 'jpeg' | 'webp';
 
@@ -147,14 +147,14 @@ export default function ExportPage() {
                 {/* Right Side: Preview */}
                 <div className="flex-1 flex flex-col gap-6 relative min-w-0">
                     {/* Main Preview Area */}
-                    <div className="flex-1 bg-[#262626]/60 backdrop-blur-[10px] overflow-hidden relative flex items-center justify-center p-8 border border-white/5">
+                    <div className="flex-1 bg-[#171717] backdrop-blur-[10px] overflow-hidden relative flex items-center justify-center p-8 border border-white/5">
                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
                         
                         {previewUrl ? (
                             <img 
                                 src={previewUrl} 
                                 alt="Export Preview" 
-                                className="max-w-full max-h-full object-contain shadow-2xl rounded-sm"
+                                className="max-w-full max-h-full object-contain rounded-sm"
                                 style={{ 
                                     filter: `drop-shadow(0 0 20px rgba(0,0,0,0.5))`,
                                     opacity: quality / 100 
@@ -179,7 +179,7 @@ export default function ExportPage() {
                     </div>
 
                     {/* Bottom Action Bar */}
-                    <div className="bg-[#262626]/60 backdrop-blur-[10px] p-4 flex items-center justify-between shrink-0 border border-white/5">
+                    <div className="bg-[#171717] backdrop-blur-[10px] p-4 flex items-center justify-between shrink-0 border border-white/5">
                         <div className="flex items-center gap-6">
                             <div className="flex flex-col gap-1">
                                 <span className="text-[10px] text-[#adaaaa] tracking-tight uppercase">Estimated File Size</span>
@@ -205,7 +205,7 @@ export default function ExportPage() {
                                 className="bg-[#8354E0] text-white px-8 py-3 text-sm font-bold flex items-center gap-2 hover:bg-[#a38cff] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                             >
                                 Export Now
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                <Download width="16"/>
                             </button>
                         </div>
                     </div>
