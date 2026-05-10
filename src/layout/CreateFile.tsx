@@ -45,11 +45,25 @@ const PRESETS = [
 function CreateFileContent() {
     const navigate = useNavigate();
     const { resetEditor } = useEditorStore();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [customSize, setCustomSize] = useState({ width: 1920, height: 1080 });
-    const [backgroundType, setBackgroundType] = useState<'white' | 'transparent' | 'custom'>('white');
-    const [customBgColor, setCustomBgColor] = useState('#ffffff');
-    const [projectName, setProjectName] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);    
+    const DEFAULT_SIZE = { width: 1920, height: 1080 };
+    const DEFAULT_BG_TYPE = 'white';
+    const DEFAULT_BG_COLOR = '#ffffff';
+    const DEFAULT_PROJECT_NAME = '';
+
+    const [customSize, setCustomSize] = useState(DEFAULT_SIZE);
+    const [backgroundType, setBackgroundType] = useState<'white' | 'transparent' | 'custom'>(DEFAULT_BG_TYPE);
+    const [customBgColor, setCustomBgColor] = useState(DEFAULT_BG_COLOR);
+    const [projectName, setProjectName] = useState(DEFAULT_PROJECT_NAME);
+
+    const isLandscape = customSize.width >= customSize.height;
+
+    const resetValues = () => {
+        setCustomSize(DEFAULT_SIZE);
+        setBackgroundType(DEFAULT_BG_TYPE);
+        setCustomBgColor(DEFAULT_BG_COLOR);
+        setProjectName(DEFAULT_PROJECT_NAME);
+    };
 
     const handleSelectPreset = (width: number, height: number) => {
         resetEditor({ dimensions: { width, height }, background: '#ffffff' });
@@ -68,15 +82,17 @@ function CreateFileContent() {
         navigate('/');
     };
 
-    const toggleOrientation = () => {
-        setCustomSize(prev => ({
-            width: prev.height,
-            height: prev.width
-        }));
+    const setOrientation = (type: 'landscape' | 'portrait') => {
+        const { width, height } = customSize;
+        if (type === 'landscape' && width < height) {
+            setCustomSize({ width: height, height: width });
+        } else if (type === 'portrait' && width > height) {
+            setCustomSize({ width: height, height: width });
+        }
     };
 
     return (
-        <div className="flex-1 bg-[#0a0a0a] text-white p-12 overflow-y-auto">
+        <div className="flex-1 bg-[#0a0a0a] text-white p-12">
             <div className="max-w-6xl mx-auto">
                 <header className="mb-12">
                     <h1 className="text-4xl font-bold mb-2 tracking-tight">Welcome back, Creator</h1>
@@ -120,131 +136,156 @@ function CreateFileContent() {
             {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-[#111111] border border-[#222] w-4xl">
-                        <div className="flex justify-between items-start m-8">
+                    <div className="bg-[#131313]  w-3xl overflow-hidden">
+                        {/* Header */}
+                        <div className="flex justify-between items-start pt-10 pb-6 px-10">
                             <div className="flex flex-col gap-1">
-                                <h2 className="text-2xl font-bold">Create New Masterpiece</h2>
-                                <p className="text-gray-500 text-sm">Configure your workspace for a new creative journey.</p>
-
+                                <h2 className="text-3xl font-extrabold text-white tracking-tight">Create New Masterpiece</h2>
+                                <p className="text-[#adaaaa] text-sm font-medium">Configure your workspace for a new creative journey.</p>
                             </div>
                             
-                            <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white transition-colors">
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 transition-colors text-[#adaaaa] hover:text-white">
                                 <svg width="16" height="16" viewBox="0 0 9 9" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M1 9H0V8H1V9ZM9 9H8V8H9V9ZM2 8H1V7H2V8ZM8 8H7V7H8V8ZM3 7H2V6H3V7ZM7 7H6V6H7V7ZM4 6H3V5H4V6ZM6 6H5V5H6V6ZM5 5H4V4H5V5ZM4 4H3V3H4V4ZM6 4H5V3H6V4ZM3 3H2V2H3V3ZM7 3H6V2H7V3ZM2 2H1V1H2V2ZM8 2H7V1H8V2ZM1 1H0V0H1V1ZM9 1H8V0H9V1Z" fill="currentColor"/>
+                                    <path d="M1 9H0V8H1V9ZM9 9H8V8H9V9ZM2 8H1V7H2V8ZM8 8H7V7H8V8ZM3 7H2V6H3V7ZM7 7H6V6H7V7ZM4 6H3V5H4V6ZM6 6H5V5H6V6ZM5 5H4V4H5V5ZM4 4H3V3H4V4ZM6 4H5V3H6V4ZM3 3H2V2H3V3ZM7 3H6V2H7V3ZM2 2H1V1H2V2ZM8 2H7V1H8V2ZM1 1H0V0H1V1ZM9 1H8V0H9V1Z" fill="currentColor"/>
                                 </svg>
-
                             </button>
                         </div>
 
-                        <div className="space-y-6 m-8">
+                        {/* Content */}
+                        <div className="px-10 pb-10 space-y-8">
+                            {/* Project Name */}
                             <div className="flex flex-col gap-2">
-                                <label htmlFor="projectName" className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Project Name</label>
+                                <label htmlFor="projectName" className="text-[12px] font-semibold text-[#b6a0ff] uppercase tracking-[1.2px]">Project Name</label>
                                 <input 
                                     type="text" 
                                     id="projectName"
+                                    placeholder="Untitled Artwork"
                                     value={projectName}
                                     onChange={(e) => setProjectName(e.target.value)}
-                                    className="w-full bg-[#1a1a1a] px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors"
+                                    className="w-full bg-[#262626] px-4 py-4 text-white focus:outline-none placeholder:text-[#adaaaa]/40 transition-colors"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label htmlFor="width" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Width (px)</label>
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-8">
+                                {/* Dimensions */}
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="width" className="text-[14px]  text-[#adaaaa] tracking-[1.2px]">Width (px)</label>
                                     <input 
                                         type="number" 
                                         id="width"
                                         value={customSize.width}
                                         onChange={(e) => setCustomSize(prev => ({ ...prev, width: parseInt(e.target.value) || 0 }))}
-                                        className="w-full bg-[#1a1a1a] px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors"
+                                        className="w-full bg-[#262626] px-4 py-3 text-white focus:outline-none transition-colors"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="height" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Height (px)</label>
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="height" className="text-[14px]  text-[#adaaaa] tracking-[1.2px]">Height (px)</label>
                                     <input 
                                         type="number" 
                                         id="height"
                                         value={customSize.height}
                                         onChange={(e) => setCustomSize(prev => ({ ...prev, height: parseInt(e.target.value) || 0 }))}
-                                        className="w-full bg-[#1a1a1a] px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors"
+                                        className="w-full bg-[#262626] px-4 py-3 text-white focus:outline-none transition-colors"
                                     />
                                 </div>
-                            </div>
 
-                            <div className="grid grid-cols-2 gap-8 ">
-
-                                <div className="">
-                                    <label htmlFor="" className="">Orientation</label>
-                                    <div className=""></div>
+                                {/* Orientation */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[14px]  text-[#adaaaa] tracking-[1.2px]">Orientation</label>
+                                    <div className="bg-[#262626] p-1.5 flex gap-2 h-[54px]">
+                                        <button 
+                                            onClick={() => setOrientation('landscape')}
+                                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 transition-all ${isLandscape ? 'bg-[#c7aaff] text-[#8354e0]' : 'text-[#adaaaa] hover:text-white'}`}
+                                        >
+                                            <svg width="23" height="19" viewBox="0 0 22 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M8 16H14V14H16V16H20V18H2V16H6V14H8V16ZM2 16H0V2H2V16ZM22 16H20V2H22V16ZM14 14H8V12H14V14ZM13 11H9V9H13V11ZM9 9H7V5H9V9ZM15 9H13V5H15V9ZM13 5H9V3H13V5ZM20 2H2V0H20V2Z" fill="currentColor"/>
+                                            </svg>
+                                            <span className="text-sm font-semibold">Landscape</span>
+                                        </button>
+                                        <button 
+                                            onClick={() => setOrientation('portrait')}
+                                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 transition-all ${!isLandscape ? 'bg-[#c7aaff] text-[#8354e0]' : 'text-[#adaaaa] hover:text-white'}`}
+                                        >
+                                            <svg width="20" height="23" viewBox="0 0 18 21" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M6 19H12V15H14V19H16V21H2V19H4V15H6V19ZM2 19H0V2H2V19ZM18 19H16V2H18V19ZM12 15H6V13H12V15ZM11 12H7V10H11V12ZM7 10H5V6H7V10ZM13 10H11V6H13V10ZM11 6H7V4H11V6ZM16 2H2V0H16V2Z" fill="currentColor"/>
+                                            </svg>
+                                            <span className="text-sm font-semibold">Portrait</span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <button 
-                                    onClick={toggleOrientation}
-                                    className="w-full bg-[#1a1a1a] px-4 py-3 flex items-center justify-center gap-3 hover:bg-[#222] transition-colors group"
-                                >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500 group-hover:rotate-90 transition-transform duration-300">
-                                        <path d="M17 2.1l4 4-4 4"></path>
-                                        <path d="M3 12.2v-2a4 4 0 0 1 4-4h12.8"></path>
-                                        <path d="M7 21.9l-4-4 4-4"></path>
-                                        <path d="M21 11.8v2a4 4 0 0 1-4 4H4.2"></path>
-                                    </svg>
-                                    <span className="font-medium">Swap Orientation</span>
-                                </button>
 
-                                <div className="space-y-4">
-                                    <label htmlFor="background" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Background</label>
-                                    <div className="grid grid-cols-3 gap-2">
+                                {/* Background Color */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[14px]  text-[#adaaaa] tracking-[1.2px]">Background Color</label>
+                                    <div className="flex gap-4">
                                         <button 
                                             onClick={() => setBackgroundType('white')}
-                                            className={`px-3 py-2 rounded-lg border text-sm transition-all ${backgroundType === 'white' ? 'bg-white text-black border-white' : 'bg-[#1a1a1a] border-[#333] text-gray-400 hover:border-gray-500'}`}
+                                            className={`w-10 h-10 border transition-all ${backgroundType === 'white' ? 'border-[#c7aaff] ring-1 ring-[#c7aaff]' : 'border-transparent'}`}
+                                            title="White"
                                         >
-                                            White
+                                            <div className="w-full h-full bg-white"></div>
                                         </button>
                                         <button 
                                             onClick={() => setBackgroundType('transparent')}
-                                            className={`px-3 py-2 rounded-lg border text-sm transition-all ${backgroundType === 'transparent' ? 'bg-purple-500 border-purple-500 text-white' : 'bg-[#1a1a1a] border-[#333] text-gray-400 hover:border-gray-500'}`}
+                                            className={`w-10 h-10 border transition-all overflow-hidden relative ${backgroundType === 'transparent' ? 'border-[#c7aaff] ring-1 ring-[#c7aaff]' : 'border-[rgba(255,255,255,0.1)]'}`}
+                                            title="Transparent"
                                         >
-                                            Transparent
+                                            <div className="w-full h-full bg-[#262626] flex items-center justify-center">
+                                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M0 0H7V7H0V0ZM7 7H14V14H7V7Z" fill="#3f3f46"/>
+                                                </svg>
+                                            </div>
                                         </button>
                                         <button 
                                             onClick={() => setBackgroundType('custom')}
-                                            className={`px-3 py-2 rounded-lg border text-sm transition-all ${backgroundType === 'custom' ? 'bg-[#333] border-purple-500 text-white' : 'bg-[#1a1a1a] border-[#333] text-gray-400 hover:border-gray-500'}`}
+                                            className={`w-10 h-10 border transition-all p-0.5 ${backgroundType === 'custom' ? 'border-[#c7aaff] ring-1 ring-[#c7aaff]' : 'border-transparent'}`}
+                                            style={{ backgroundImage: 'linear-gradient(135deg, #b6a0ff 0%, #00e3fd 100%)' }}
+                                            title="Custom Color"
                                         >
-                                            Custom
+                                            <div className="w-full h-full bg-[#262626] flex items-center justify-center">
+                                                <input 
+                                                    type="color" 
+                                                    value={customBgColor}
+                                                    onChange={(e) => {
+                                                        setCustomBgColor(e.target.value);
+                                                        setBackgroundType('custom');
+                                                    }}
+                                                    className="w-full h-full cursor-pointer bg-transparent border-none p-0 "
+                                                />
+                                            </div>
                                         </button>
                                     </div>
-
-                                    {backgroundType === 'custom' && (
-                                        <div className="flex items-center gap-3 bg-[#1a1a1a] p-3 rounded-lg border border-[#333]">
-                                            <input 
-                                                type="color" 
-                                                id="customBackground"
-                                                value={customBgColor}
-                                                onChange={(e) => setCustomBgColor(e.target.value)}
-                                                className="w-10 h-10 rounded cursor-pointer bg-transparent border-none"
-                                            />
-                                            <input 
-                                                type="text" 
-                                                value={customBgColor}
-                                                onChange={(e) => setCustomBgColor(e.target.value)}
-                                                className="bg-transparent text-sm font-mono focus:outline-none w-24"
-                                            />
-                                        </div>
-                                    )}
                                 </div>
                             </div>
-                            
-
-                            
-
-
                         </div>
-                    <div className="bg-[#20201F] p-4 flex items-center justify-between ">
-                       <p className="text-gray-400">Reset Values</p>
-                        <div className="flex items-center gap-3.5">
-                            <button onClick={() => setIsModalOpen(false)} className="py-2.5 px-5 bg-[#333] hover:bg-[#444] text-gray-400 font-medium focus:outline-none">Cancel</button>
-                            <button onClick={handleCreateCustom} className="py-2.5 px-5 bg-purple-600 hover:bg-purple-500 text-white font-medium focus:outline-none">Create Project</button>
+
+                        {/* Footer */}
+                        <div className="bg-[#20201f] px-10 py-4 flex items-center justify-between">
+                            <button 
+                                onClick={resetValues}
+                                className="flex items-center gap-2 text-[#adaaaa] hover:text-white transition-colors group"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10 12V14H4V12H10ZM4 12H2V10H4V12ZM12 12H10V10H12V12ZM2 10H0V4H2V10ZM14 10H12V4H14V10ZM14 2H12V4H10V6H8V0H14V2ZM4 4H2V2H4V4Z" fill="currentColor"/>
+                                </svg>
+                                <span className="text-sm font-semibold">Reset Values</span>
+                            </button>
+
+                            <div className="flex items-center gap-3">
+                                <button 
+                                    onClick={() => setIsModalOpen(false)} 
+                                    className="py-2.5 px-6 bg-[#333] hover:bg-[#444] text-white text-sm font-medium transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleCreateCustom} 
+                                    className="py-2.5 px-6 bg-[#8354e0] hover:bg-[#9165e9] text-white text-sm font-medium transition-colors"
+                                >
+                                    Create Project
+                                </button>
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </div>
             )}
