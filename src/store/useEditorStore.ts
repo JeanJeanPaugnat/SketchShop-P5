@@ -4,7 +4,9 @@ import type { Tool, Layer, DrawingSettings } from '../core/types';
 interface EditorState {
   // Canvas State
   canvasDimensions: { width: number; height: number };
+  canvasBackground: string;
   setCanvasDimensions: (dimensions: { width: number; height: number }) => void;
+  setCanvasBackground: (background: string) => void;
 
   // Tool State
   activeTool: Tool;
@@ -24,7 +26,7 @@ interface EditorState {
   addLayer: () => void;
   deleteActiveLayer: () => void;
   updateActiveLayerOpacity: (opacity: number) => void;
-  resetEditor: (dimensions: { width: number; height: number }) => void;
+  resetEditor: (params: { dimensions: { width: number; height: number }, background?: string }) => void;
 
   // Filter State
   applyFilter: { type: 'threshold' | 'pixelate' | 'ascii', timestamp: number } | undefined;
@@ -40,7 +42,9 @@ interface EditorState {
 export const useEditorStore = create<EditorState>((set) => ({
   // Canvas State
   canvasDimensions: { width: 1200, height: 800 },
+  canvasBackground: '#ffffff',
   setCanvasDimensions: (canvasDimensions) => set({ canvasDimensions }),
+  setCanvasBackground: (canvasBackground) => set({ canvasBackground }),
 
   // Tool State
   activeTool: 'brush',
@@ -108,8 +112,9 @@ export const useEditorStore = create<EditorState>((set) => ({
   updateActiveLayerOpacity: (opacity) => set((state) => ({
     layers: state.layers.map(l => l.isActive ? { ...l, opacity } : l)
   })),
-  resetEditor: (dimensions) => set({
+  resetEditor: ({ dimensions, background = '#ffffff' }) => set({
     canvasDimensions: dimensions,
+    canvasBackground: background,
     layers: [
       {
         id: '1',
