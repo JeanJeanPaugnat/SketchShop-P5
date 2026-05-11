@@ -11,5 +11,5 @@
 </p>
 
 <p align="">
-  <a href="https://papillon.bzh/"><picture><img alt="Site web" src="https://github.com/JeanJeanPaugnat/SketchShop-P5/blob/main/public/Button2.png?raw=true"></picture></a>                     <a href="https://jeanjeanpaugnat.github.io/SketchShop-P5/"><picture><img alt="contactme" src="https://github.com/JeanJeanPaugnat/SketchShop-P5/blob/main/public/Button.png?raw=true"></picture></a>
+  <a href="https://jeanjeanpaugnat.github.io/SketchShop-P5/"><picture><img alt="Site web" src="https://github.com/JeanJeanPaugnat/SketchShop-P5/blob/main/public/Button2.png?raw=true"></picture></a>                     <a href="https://www.linkedin.com/in/jeanpaugnat/"><picture><img alt="contactme" src="https://github.com/JeanJeanPaugnat/SketchShop-P5/blob/main/public/Button.png?raw=true"></picture></a>
 </p>
