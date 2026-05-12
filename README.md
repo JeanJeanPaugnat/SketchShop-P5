@@ -1,6 +1,6 @@
 
 <p align="">
-  <a href="https://github.com/JeanJeanPaugnat/SketchShop-P5"><picture><img alt="Papillon" src="https://github.com/JeanJeanPaugnat/SketchShop-P5/blob/main/public/Component%203.png?raw=true"></picture></a>
+  <a href="https://github.com/JeanJeanPaugnat/SketchShop-P5"><picture><source media="(prefers-color-scheme: dark)" srcset="https://github.com/JeanJeanPaugnat/SketchShop-P5/blob/main/public/Component%203.png?raw=true"><source media="(prefers-color-scheme: light)" srcset="https://github.com/JeanJeanPaugnat/SketchShop-P5/blob/main/public/Component4.png?raw=true"><img alt="img-Sketch" src="https://github.com/JeanJeanPaugnat/SketchShop-P5/blob/main/public/Component%203.png?raw=true"></picture></a>
 </p>
 
 <p align="">
