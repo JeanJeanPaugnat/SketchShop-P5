@@ -11,7 +11,7 @@ export default function PinZoomPinch () {
   return (
     <>
     <ContextualBar />
-    <div className="flex-1 flex bg-gray-100 overflow-hidden relative">
+    <div className="flex-1 flex overflow-hidden relative">
           <TransformWrapper
             initialScale={0.45}
             minScale={0.1}
@@ -35,7 +35,7 @@ export default function PinZoomPinch () {
             }}
           >
             <TransformComponent
-              wrapperClass="!w-full !h-full !max-w-none !max-h-none rounded-none border-none overflow-hidden "
+              wrapperClass="!w-full !h-full !max-w-none !max-h-none rounded-none border-none custom-pattern overflow-hidden "
               contentClass="!w-full !h-full flex items-center justify-center"
             >
                 <div 

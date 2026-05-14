@@ -27,4 +27,11 @@ body {
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
     background-color: #FFFFFF;
   }
+
+
+  .custom-pattern {
+	background-image: radial-gradient(#696969 1.2px, transparent 1.2px);
+	background-size: 18px 18px;
+	background-color: #2e2e2e;
+}
 }
