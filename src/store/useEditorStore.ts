@@ -71,7 +71,6 @@ export const useEditorStore = create<EditorState>((set, get) => {
     const nextHistory = state.history.slice(0, state.historyIndex + 1);
     const newSnapshot = createSnapshot(state);
     const newIndex = nextHistory.length;
-    console.log(`[Store] saveHistory: index=${newIndex}, historyLength=${nextHistory.length + 1}, layers=`, newSnapshot.layers.map(l => l.name), "layerDataKeys=", Array.from(newSnapshot.layerData.keys()));
     set({
       history: [...nextHistory, newSnapshot],
       historyIndex: newIndex,
@@ -240,13 +239,9 @@ export const useEditorStore = create<EditorState>((set, get) => {
     historyIndex: 0,
     saveHistory,
     undo: () => set((state) => {
-      if (state.historyIndex <= 0) {
-        console.log(`[Store] undo: already at the first state (index 0)`);
-        return state;
-      }
+      if (state.historyIndex <= 0) return state;
       const nextIndex = state.historyIndex - 1;
       const snapshot = state.history[nextIndex];
-      console.log(`[Store] undo: moving to index=${nextIndex}, layers=`, snapshot.layers.map(l => l.name), "layerDataKeys=", Array.from(snapshot.layerData.keys()));
       return {
         historyIndex: nextIndex,
         layers: snapshot.layers.map(l => ({ ...l })),
@@ -256,13 +251,9 @@ export const useEditorStore = create<EditorState>((set, get) => {
       };
     }),
     redo: () => set((state) => {
-      if (state.historyIndex >= state.history.length - 1) {
-        console.log(`[Store] redo: already at the last state (index ${state.history.length - 1})`);
-        return state;
-      }
+      if (state.historyIndex >= state.history.length - 1) return state;
       const nextIndex = state.historyIndex + 1;
       const snapshot = state.history[nextIndex];
-      console.log(`[Store] redo: moving to index=${nextIndex}, layers=`, snapshot.layers.map(l => l.name), "layerDataKeys=", Array.from(snapshot.layerData.keys()));
       return {
         historyIndex: nextIndex,
         layers: snapshot.layers.map(l => ({ ...l })),

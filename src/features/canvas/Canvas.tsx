@@ -83,8 +83,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     saveHistoryProp = props.saveHistory;
     canvasBackground = props.canvasBackground;
     
-    console.log(`[Canvas] updateWithProps: layersCount=${layersData.length}, layerDataKeys=`, props.layerData ? Array.from(props.layerData.keys()) : 'undefined');
-
     if (props.canvasDimensions.width !== canvasDimensions.width || props.canvasDimensions.height !== canvasDimensions.height) {
         canvasDimensions = props.canvasDimensions;
         p5.resizeCanvas(canvasDimensions.width, canvasDimensions.height);
@@ -104,12 +102,10 @@ const sketch: Sketch<CanvasProps> = (p5) => {
       const storeDataUrl = props.layerData?.get(layer.id);
       if (!layerGraphics.has(layer.id)) {
         const g = p5.createGraphics(canvasDimensions.width, canvasDimensions.height);
-        console.log(`[Canvas] Initializing graphics for Layer ${layer.id}, storeDataUrl length=${storeDataUrl ? storeDataUrl.length : 0}`);
         // Restore from store if data exists
         if (storeDataUrl) {
           p5.loadImage(storeDataUrl, 
             (img) => {
-              console.log(`[Canvas] Loaded initial image for Layer ${layer.id}`);
               g.image(img, 0, 0);
             },
             (err) => {
@@ -126,13 +122,11 @@ const sketch: Sketch<CanvasProps> = (p5) => {
         const localDataUrl = lastSyncedDataUrl.get(layer.id) || '';
         const currentStoreDataUrl = storeDataUrl || '';
         if (currentStoreDataUrl !== localDataUrl) {
-          console.log(`[Canvas] Layer ${layer.id} changed. StoreDataUrl len=${currentStoreDataUrl.length}, LocalDataUrl len=${localDataUrl.length}`);
           const g = layerGraphics.get(layer.id);
           if (g) {
             if (storeDataUrl) {
               p5.loadImage(storeDataUrl, 
                 (img) => {
-                  console.log(`[Canvas] Reloaded and restored Layer ${layer.id} from store`);
                   g.clear();
                   g.image(img, 0, 0);
                 },
@@ -141,7 +135,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
                 }
               );
             } else {
-              console.log(`[Canvas] Clearing Layer ${layer.id} because it is empty in store`);
               g.clear();
             }
             lastSyncedDataUrl.set(layer.id, currentStoreDataUrl);
@@ -264,7 +257,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
         const g = layerGraphics.get(activeLayer.id);
         if (g) {
             const dataUrl = (g as any).canvas.toDataURL();
-            console.log(`[Canvas] syncToStore: Layer ${activeLayer.id}, dataUrl length=${dataUrl.length}`);
             onUpdateLayer(activeLayer.id, dataUrl);
             lastSyncedDataUrl.set(activeLayer.id, dataUrl);
         }
@@ -306,7 +298,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     }
 
     if (wasDrawingSession) {
-      console.log(`[Canvas] mouseReleased: drawing stroke completed, syncing and saving history`);
       syncToStore();
       saveHistoryProp?.();
       wasDrawingSession = false;
@@ -390,8 +381,6 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 export function Canvas() {
   const { activeTool, layers, settings, applyFilter, canvasDimensions, canvasBackground, setPreviewUrl, layerData, setLayerData, saveHistory, historyIndex } = useEditorStore();
   
-  console.log(`[React] Canvas rendering. historyIndex=${historyIndex}, layers=`, layers.map(l => l.name), "layerDataKeys=", Array.from(layerData.keys()));
-
   // We don't have direct access to the p5 instance here, 
   // but the sketch itself handles periodic syncing.
   // To ensure a sync on unmount, we'd need to expose a way from the sketch.
