@@ -58,12 +58,12 @@ export default function ContextualBar() {
       </div>
 
       {/* History Controls */}
-      <div className="flex items-center gap-3 pl-4 border-l border-white/10 ml-auto">
+      <div className="flex items-center pl-4 gap-1 border-l border-white/10 ml-auto">
         <button
           onClick={undo}
           disabled={historyIndex <= 0}
           title="Undo (Ctrl+Z)"
-          className="flex items-center justify-center p-1 rounded hover:bg-[#2A2A2A] text-gray-300 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          className="flex items-center justify-center p-1 hover:bg-[#2A2A2A] text-gray-300 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
         >
           <Undo width={18} height={18} />
         </button>
@@ -71,7 +71,7 @@ export default function ContextualBar() {
           onClick={redo}
           disabled={historyIndex >= history.length - 1}
           title="Redo (Ctrl+Shift+Z)"
-          className="flex items-center justify-center p-1 rounded hover:bg-[#2A2A2A] text-gray-300 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          className="flex items-center justify-center p-1 hover:bg-[#2A2A2A] text-gray-300 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
         >
           <Redo width={18} height={18} />
         </button>
