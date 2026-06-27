@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 import type { Tool, Layer, DrawingSettings } from '../core/types';
 
+export interface HistorySnapshot {
+  layers: Layer[];
+  layerData: Map<string, string>;
+  canvasDimensions: { width: number; height: number };
+  canvasBackground: string;
+}
+
 interface EditorState {
   // Canvas State
   canvasDimensions: { width: number; height: number };
@@ -37,35 +44,41 @@ interface EditorState {
   setPreviewUrl: (url: string | null) => void;
   layerData: Map<string, string>; // Maps layer ID to data URL
   setLayerData: (id: string, dataUrl: string) => void;
+
+  // History State
+  history: HistorySnapshot[];
+  historyIndex: number;
+  undo: () => void;
+  redo: () => void;
+  saveHistory: () => void;
 }
 
-export const useEditorStore = create<EditorState>((set) => ({
-  // Canvas State
-  canvasDimensions: { width: 1200, height: 800 },
-  canvasBackground: '#ffffff',
-  setCanvasDimensions: (canvasDimensions) => set({ canvasDimensions }),
-  setCanvasBackground: (canvasBackground) => set({ canvasBackground }),
+export const useEditorStore = create<EditorState>((set, get) => {
+  const createSnapshot = (state: {
+    layers: Layer[];
+    layerData: Map<string, string>;
+    canvasDimensions: { width: number; height: number };
+    canvasBackground: string;
+  }): HistorySnapshot => ({
+    layers: state.layers.map(l => ({ ...l })),
+    layerData: new Map(state.layerData),
+    canvasDimensions: { ...state.canvasDimensions },
+    canvasBackground: state.canvasBackground,
+  });
 
-  // Tool State
-  activeTool: 'brush',
-  setActiveTool: (tool) => set({ activeTool: tool }),
+  const saveHistory = () => {
+    const state = get();
+    const nextHistory = state.history.slice(0, state.historyIndex + 1);
+    const newSnapshot = createSnapshot(state);
+    const newIndex = nextHistory.length;
+    console.log(`[Store] saveHistory: index=${newIndex}, historyLength=${nextHistory.length + 1}, layers=`, newSnapshot.layers.map(l => l.name), "layerDataKeys=", Array.from(newSnapshot.layerData.keys()));
+    set({
+      history: [...nextHistory, newSnapshot],
+      historyIndex: newIndex,
+    });
+  };
 
-  // Settings State
-  settings: {
-    color: '#000000',
-    brushSize: 5,
-    opacity: 100,
-    isDynamicBrush: false,
-    pixelSize: 10,
-    threshold: 128,
-    asciiScale: 10,
-  },
-  setSettings: (settings) => set({ settings }),
-  updateSetting: (key, value) => 
-    set((state) => ({ settings: { ...state.settings, [key]: value } })),
-
-  // Layers State
-  layers: [
+  const initialLayers: Layer[] = [
     {
       id: '1',
       name: "Calque 1",
@@ -74,72 +87,189 @@ export const useEditorStore = create<EditorState>((set) => ({
       isActive: true,
       opacity: 100,
     }
-  ],
-  setLayers: (layers) => set({ layers }),
-  toggleVisibility: (id) => set((state) => ({
-    layers: state.layers.map(l => l.id === id ? { ...l, isVisible: !l.isVisible } : l)
-  })),
-  toggleLock: (id) => set((state) => ({
-    layers: state.layers.map(l => l.id === id ? { ...l, isLocked: !l.isLocked } : l)
-  })),
-  setActiveLayer: (id) => set((state) => ({
-    layers: state.layers.map(l => ({ ...l, isActive: l.id === id }))
-  })),
-  addLayer: () => set((state) => {
-    const newLayer: Layer = {
-      id: Math.random().toString(36).substring(2, 9),
-      name: `Calque ${state.layers.length + 1}`,
-      isVisible: true,
-      isLocked: false,
-      isActive: true,
-      opacity: 100,
-    };
-    return {
-      layers: [...state.layers.map(l => ({ ...l, isActive: false })), newLayer]
-    };
-  }),
-  deleteActiveLayer: () => set((state) => {
-    if (state.layers.length <= 1) return state;
-    const activeIndex = state.layers.findIndex(l => l.isActive);
-    if (activeIndex === -1) return state;
+  ];
 
-    const newLayers = state.layers.filter((_, i) => i !== activeIndex);
-    const nextActiveIndex = Math.max(0, activeIndex - 1);
-    newLayers[nextActiveIndex].isActive = true;
-    
-    return { layers: newLayers };
-  }),
-  updateActiveLayerOpacity: (opacity) => set((state) => ({
-    layers: state.layers.map(l => l.isActive ? { ...l, opacity } : l)
-  })),
-  resetEditor: ({ dimensions, background = '#ffffff' }) => set({
-    canvasDimensions: dimensions,
-    canvasBackground: background,
-    layers: [
+  const initialDimensions = { width: 1200, height: 800 };
+  const initialBackground = '#ffffff';
+
+  return {
+    // Canvas State
+    canvasDimensions: initialDimensions,
+    canvasBackground: initialBackground,
+    setCanvasDimensions: (canvasDimensions) => {
+      set({ canvasDimensions });
+      saveHistory();
+    },
+    setCanvasBackground: (canvasBackground) => {
+      set({ canvasBackground });
+      saveHistory();
+    },
+
+    // Tool State
+    activeTool: 'brush',
+    setActiveTool: (tool) => set({ activeTool: tool }),
+
+    // Settings State
+    settings: {
+      color: '#000000',
+      brushSize: 5,
+      opacity: 100,
+      isDynamicBrush: false,
+      pixelSize: 10,
+      threshold: 128,
+      asciiScale: 10,
+    },
+    setSettings: (settings) => set({ settings }),
+    updateSetting: (key, value) => 
+      set((state) => ({ settings: { ...state.settings, [key]: value } })),
+
+    // Layers State
+    layers: initialLayers,
+    setLayers: (layers) => set({ layers }), // Reordering updates state, history saved on dragEnd in SideBarLayer
+    toggleVisibility: (id) => {
+      set((state) => ({
+        layers: state.layers.map(l => l.id === id ? { ...l, isVisible: !l.isVisible } : l)
+      }));
+      saveHistory();
+    },
+    toggleLock: (id) => {
+      set((state) => ({
+        layers: state.layers.map(l => l.id === id ? { ...l, isLocked: !l.isLocked } : l)
+      }));
+      saveHistory();
+    },
+    setActiveLayer: (id) => set((state) => ({
+      layers: state.layers.map(l => ({ ...l, isActive: l.id === id }))
+    })),
+    addLayer: () => {
+      set((state) => {
+        const newLayer: Layer = {
+          id: Math.random().toString(36).substring(2, 9),
+          name: `Calque ${state.layers.length + 1}`,
+          isVisible: true,
+          isLocked: false,
+          isActive: true,
+          opacity: 100,
+        };
+        return {
+          layers: [...state.layers.map(l => ({ ...l, isActive: false })), newLayer]
+        };
+      });
+      saveHistory();
+    },
+    deleteActiveLayer: () => {
+      set((state) => {
+        if (state.layers.length <= 1) return state;
+        const activeIndex = state.layers.findIndex(l => l.isActive);
+        if (activeIndex === -1) return state;
+
+        const newLayers = state.layers.filter((_, i) => i !== activeIndex);
+        const nextActiveIndex = Math.max(0, activeIndex - 1);
+        newLayers[nextActiveIndex].isActive = true;
+        
+        return { layers: newLayers };
+      });
+      saveHistory();
+    },
+    updateActiveLayerOpacity: (opacity) => set((state) => ({
+      layers: state.layers.map(l => l.isActive ? { ...l, opacity } : l)
+    })),
+    resetEditor: ({ dimensions, background = '#ffffff' }) => {
+      const newLayers = [
+        {
+          id: '1',
+          name: "Calque 1",
+          isVisible: true,
+          isLocked: false,
+          isActive: true,
+          opacity: 100,
+        }
+      ];
+      const newLayerData = new Map<string, string>();
+      const newSnapshot = createSnapshot({
+        layers: newLayers,
+        layerData: newLayerData,
+        canvasDimensions: dimensions,
+        canvasBackground: background,
+      });
+
+      set({
+        canvasDimensions: dimensions,
+        canvasBackground: background,
+        layers: newLayers,
+        layerData: newLayerData,
+        activeTool: 'brush',
+        applyFilter: undefined,
+        history: [newSnapshot],
+        historyIndex: 0,
+      });
+    },
+
+    // Filter State
+    applyFilter: undefined,
+    triggerFilter: (type) => set({ applyFilter: { type, timestamp: Date.now() } }),
+
+    // Export & Persistence State
+    previewUrl: null,
+    setPreviewUrl: (previewUrl) => set({ previewUrl }),
+    layerData: new Map(),
+    setLayerData: (id, dataUrl) => set((state) => {
+      const newLayerData = new Map(state.layerData);
+      newLayerData.set(id, dataUrl);
+      return { layerData: newLayerData };
+    }),
+
+    // History State
+    history: [
       {
-        id: '1',
-        name: "Calque 1",
-        isVisible: true,
-        isLocked: false,
-        isActive: true,
-        opacity: 100,
+        layers: [
+          {
+            id: '1',
+            name: "Calque 1",
+            isVisible: true,
+            isLocked: false,
+            isActive: true,
+            opacity: 100,
+          }
+        ],
+        layerData: new Map(),
+        canvasDimensions: { width: 1200, height: 800 },
+        canvasBackground: '#ffffff',
       }
     ],
-    activeTool: 'brush',
-    applyFilter: undefined,
-  }),
-
-  // Filter State
-  applyFilter: undefined,
-  triggerFilter: (type) => set({ applyFilter: { type, timestamp: Date.now() } }),
-
-  // Export & Persistence State
-  previewUrl: null,
-  setPreviewUrl: (previewUrl) => set({ previewUrl }),
-  layerData: new Map(),
-  setLayerData: (id, dataUrl) => set((state) => {
-    const newLayerData = new Map(state.layerData);
-    newLayerData.set(id, dataUrl);
-    return { layerData: newLayerData };
-  }),
-}));
+    historyIndex: 0,
+    saveHistory,
+    undo: () => set((state) => {
+      if (state.historyIndex <= 0) {
+        console.log(`[Store] undo: already at the first state (index 0)`);
+        return state;
+      }
+      const nextIndex = state.historyIndex - 1;
+      const snapshot = state.history[nextIndex];
+      console.log(`[Store] undo: moving to index=${nextIndex}, layers=`, snapshot.layers.map(l => l.name), "layerDataKeys=", Array.from(snapshot.layerData.keys()));
+      return {
+        historyIndex: nextIndex,
+        layers: snapshot.layers.map(l => ({ ...l })),
+        layerData: new Map(snapshot.layerData),
+        canvasDimensions: { ...snapshot.canvasDimensions },
+        canvasBackground: snapshot.canvasBackground,
+      };
+    }),
+    redo: () => set((state) => {
+      if (state.historyIndex >= state.history.length - 1) {
+        console.log(`[Store] redo: already at the last state (index ${state.history.length - 1})`);
+        return state;
+      }
+      const nextIndex = state.historyIndex + 1;
+      const snapshot = state.history[nextIndex];
+      console.log(`[Store] redo: moving to index=${nextIndex}, layers=`, snapshot.layers.map(l => l.name), "layerDataKeys=", Array.from(snapshot.layerData.keys()));
+      return {
+        historyIndex: nextIndex,
+        layers: snapshot.layers.map(l => ({ ...l })),
+        layerData: new Map(snapshot.layerData),
+        canvasDimensions: { ...snapshot.canvasDimensions },
+        canvasBackground: snapshot.canvasBackground,
+      };
+    }),
+  };
+});

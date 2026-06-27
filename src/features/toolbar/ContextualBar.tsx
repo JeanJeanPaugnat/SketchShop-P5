@@ -1,7 +1,8 @@
 import { useEditorStore } from '../../store/useEditorStore';
+import { Undo, Redo } from 'pixelarticons/react';
 
 export default function ContextualBar() {
-  const { activeTool, settings, updateSetting } = useEditorStore();
+  const { activeTool, settings, updateSetting, undo, redo, historyIndex, history } = useEditorStore();
 
   return (
     <div className="flex items-center gap-6 px-6 py-2 bg-[#131313] text-white">
@@ -54,6 +55,26 @@ export default function ContextualBar() {
           />
           <label htmlFor="dynamic" className="text-[10px] text-gray-400 font-bold uppercase cursor-pointer">Dynamic</label>
         </div>
+      </div>
+
+      {/* History Controls */}
+      <div className="flex items-center gap-3 pl-4 border-l border-white/10 ml-auto">
+        <button
+          onClick={undo}
+          disabled={historyIndex <= 0}
+          title="Undo (Ctrl+Z)"
+          className="flex items-center justify-center p-1 rounded hover:bg-[#2A2A2A] text-gray-300 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+        >
+          <Undo width={18} height={18} />
+        </button>
+        <button
+          onClick={redo}
+          disabled={historyIndex >= history.length - 1}
+          title="Redo (Ctrl+Shift+Z)"
+          className="flex items-center justify-center p-1 rounded hover:bg-[#2A2A2A] text-gray-300 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+        >
+          <Redo width={18} height={18} />
+        </button>
       </div>
     </div>
   );

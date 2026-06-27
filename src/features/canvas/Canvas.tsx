@@ -14,6 +14,8 @@ interface CanvasProps {
   layerData?: Map<string, string>;
   onUpdateCanvas?: (dataUrl: string) => void;
   onUpdateLayer?: (id: string, dataUrl: string) => void;
+  saveHistory?: () => void;
+  historyIndex?: number;
   [key: string]: any;
 }
 
@@ -33,14 +35,17 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   };
 
   const layerGraphics = new Map<string, any>();
+  const lastSyncedDataUrl = new Map<string, string>();
   let rectangleStart: { x: number, y: number } | null = null;
   let speedHistory: number[] = [];
   const SPEED_HISTORY_SIZE = 5;
   let lastFilterTimestamp = 0;
   let onUpdateCanvas: ((dataUrl: string) => void) | undefined;
   let onUpdateLayer: ((id: string, dataUrl: string) => void) | undefined;
+  let saveHistoryProp: (() => void) | undefined;
   let lastSyncTime = 0;
   let needsSync = false;
+  let wasDrawingSession = false;
 
   let localMouse = { x: 0, y: 0 };
   let prevLocalMouse = { x: 0, y: 0 };
@@ -57,33 +62,91 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     }
   }
 
+  function isMouseOverCanvas() {
+    const canvasElement = (p5 as any).canvas;
+    if (!canvasElement) return false;
+    const rect = canvasElement.getBoundingClientRect();
+    return (
+      p5.winMouseX >= rect.left &&
+      p5.winMouseX <= rect.right &&
+      p5.winMouseY >= rect.top &&
+      p5.winMouseY <= rect.bottom
+    );
+  }
+
   p5.updateWithProps = (props) => {
     activeTool = props.activeTool;
     layersData = props.layers;
     settingsData = props.settings;
     onUpdateCanvas = props.onUpdateCanvas;
     onUpdateLayer = props.onUpdateLayer;
+    saveHistoryProp = props.saveHistory;
     canvasBackground = props.canvasBackground;
     
+    console.log(`[Canvas] updateWithProps: layersCount=${layersData.length}, layerDataKeys=`, props.layerData ? Array.from(props.layerData.keys()) : 'undefined');
+
     if (props.canvasDimensions.width !== canvasDimensions.width || props.canvasDimensions.height !== canvasDimensions.height) {
         canvasDimensions = props.canvasDimensions;
         p5.resizeCanvas(canvasDimensions.width, canvasDimensions.height);
         layerGraphics.forEach((g) => g.resizeCanvas(canvasDimensions.width, canvasDimensions.height));
     }
 
+    // Clean up graphics for deleted layers
+    const layerIds = new Set(layersData.map(l => l.id));
+    layerGraphics.forEach((_, id) => {
+      if (!layerIds.has(id)) {
+        layerGraphics.delete(id);
+        lastSyncedDataUrl.delete(id);
+      }
+    });
+
     layersData.forEach(layer => {
+      const storeDataUrl = props.layerData?.get(layer.id);
       if (!layerGraphics.has(layer.id)) {
         const g = p5.createGraphics(canvasDimensions.width, canvasDimensions.height);
+        console.log(`[Canvas] Initializing graphics for Layer ${layer.id}, storeDataUrl length=${storeDataUrl ? storeDataUrl.length : 0}`);
         // Restore from store if data exists
-        if (props.layerData && props.layerData.has(layer.id)) {
-          const dataUrl = props.layerData.get(layer.id);
-          if (dataUrl) {
-            p5.loadImage(dataUrl, (img) => {
+        if (storeDataUrl) {
+          p5.loadImage(storeDataUrl, 
+            (img) => {
+              console.log(`[Canvas] Loaded initial image for Layer ${layer.id}`);
               g.image(img, 0, 0);
-            });
-          }
+            },
+            (err) => {
+              console.error(`[Canvas] Failed to load initial image for Layer ${layer.id}:`, err);
+            }
+          );
+          lastSyncedDataUrl.set(layer.id, storeDataUrl);
+        } else {
+          lastSyncedDataUrl.set(layer.id, '');
         }
         layerGraphics.set(layer.id, g);
+      } else {
+        // Layer already exists, check if data URL changed from outside (e.g. undo/redo)
+        const localDataUrl = lastSyncedDataUrl.get(layer.id) || '';
+        const currentStoreDataUrl = storeDataUrl || '';
+        if (currentStoreDataUrl !== localDataUrl) {
+          console.log(`[Canvas] Layer ${layer.id} changed. StoreDataUrl len=${currentStoreDataUrl.length}, LocalDataUrl len=${localDataUrl.length}`);
+          const g = layerGraphics.get(layer.id);
+          if (g) {
+            if (storeDataUrl) {
+              p5.loadImage(storeDataUrl, 
+                (img) => {
+                  console.log(`[Canvas] Reloaded and restored Layer ${layer.id} from store`);
+                  g.clear();
+                  g.image(img, 0, 0);
+                },
+                (err) => {
+                  console.error(`[Canvas] Failed to reload/restore Layer ${layer.id}:`, err);
+                }
+              );
+            } else {
+              console.log(`[Canvas] Clearing Layer ${layer.id} because it is empty in store`);
+              g.clear();
+            }
+            lastSyncedDataUrl.set(layer.id, currentStoreDataUrl);
+          }
+        }
       }
     });
 
@@ -95,6 +158,8 @@ const sketch: Sketch<CanvasProps> = (p5) => {
         if (g) {
           applyFilterEffect(g, props.applyFilter.type);
           needsSync = true;
+          syncToStore();
+          saveHistoryProp?.();
         }
       }
     }
@@ -133,6 +198,8 @@ const sketch: Sketch<CanvasProps> = (p5) => {
           if (g) {
             g.image(img, 0, 0);
             needsSync = true;
+            syncToStore();
+            saveHistoryProp?.();
           }
         }
       });
@@ -156,18 +223,19 @@ const sketch: Sketch<CanvasProps> = (p5) => {
       }
     });
 
-    if (p5.mouseIsPressed) {
+    if (p5.mouseIsPressed && isMouseOverCanvas()) {
       const activeLayer = layersData.find(l => l.isActive);
       if (activeLayer && !activeLayer.isLocked) {
         const g = layerGraphics.get(activeLayer.id);
         if (g) {
           handleDrawing(g);
           needsSync = true;
+          wasDrawingSession = true;
         }
       }
     }
 
-    if (activeTool === 'square' && rectangleStart && p5.mouseIsPressed) {
+    if (activeTool === 'square' && rectangleStart && p5.mouseIsPressed && isMouseOverCanvas()) {
       p5.push();
       p5.stroke(settingsData.color);
       p5.strokeWeight(2);
@@ -195,7 +263,10 @@ const sketch: Sketch<CanvasProps> = (p5) => {
     if (activeLayer && onUpdateLayer) {
         const g = layerGraphics.get(activeLayer.id);
         if (g) {
-            onUpdateLayer(activeLayer.id, (g as any).canvas.toDataURL());
+            const dataUrl = (g as any).canvas.toDataURL();
+            console.log(`[Canvas] syncToStore: Layer ${activeLayer.id}, dataUrl length=${dataUrl.length}`);
+            onUpdateLayer(activeLayer.id, dataUrl);
+            lastSyncedDataUrl.set(activeLayer.id, dataUrl);
         }
     }
     lastSyncTime = p5.millis();
@@ -203,6 +274,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   }
 
   p5.mousePressed = () => {
+    if (!isMouseOverCanvas()) return;
     updateLocalMouse();
     if (activeTool === 'square') {
       rectangleStart = { x: localMouse.x, y: localMouse.y };
@@ -210,6 +282,7 @@ const sketch: Sketch<CanvasProps> = (p5) => {
   };
 
   p5.mouseReleased = () => {
+    if (!wasDrawingSession) return;
     updateLocalMouse();
     if (activeTool === 'square' && rectangleStart) {
       const activeLayer = layersData.find(l => l.isActive);
@@ -227,10 +300,16 @@ const sketch: Sketch<CanvasProps> = (p5) => {
           );
           g.pop();
           needsSync = true;
-          syncToStore();
         }
       }
       rectangleStart = null;
+    }
+
+    if (wasDrawingSession) {
+      console.log(`[Canvas] mouseReleased: drawing stroke completed, syncing and saving history`);
+      syncToStore();
+      saveHistoryProp?.();
+      wasDrawingSession = false;
     }
   };
 
@@ -309,8 +388,10 @@ const sketch: Sketch<CanvasProps> = (p5) => {
 };
 
 export function Canvas() {
-  const { activeTool, layers, settings, applyFilter, canvasDimensions, canvasBackground, setPreviewUrl, layerData, setLayerData } = useEditorStore();
+  const { activeTool, layers, settings, applyFilter, canvasDimensions, canvasBackground, setPreviewUrl, layerData, setLayerData, saveHistory, historyIndex } = useEditorStore();
   
+  console.log(`[React] Canvas rendering. historyIndex=${historyIndex}, layers=`, layers.map(l => l.name), "layerDataKeys=", Array.from(layerData.keys()));
+
   // We don't have direct access to the p5 instance here, 
   // but the sketch itself handles periodic syncing.
   // To ensure a sync on unmount, we'd need to expose a way from the sketch.
@@ -328,6 +409,8 @@ export function Canvas() {
       layerData={layerData}
       onUpdateCanvas={setPreviewUrl}
       onUpdateLayer={setLayerData}
+      saveHistory={saveHistory}
+      historyIndex={historyIndex}
     />
   );
 }
