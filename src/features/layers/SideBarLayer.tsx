@@ -13,7 +13,8 @@ export default function SideBarLayer() {
     addLayer, 
     deleteActiveLayer,
     triggerFilter,
-    updateActiveLayerOpacity
+    updateActiveLayerOpacity,
+    saveHistory
   } = useEditorStore();
 
   const reversedLayers = [...layers].reverse();
@@ -49,6 +50,8 @@ export default function SideBarLayer() {
             max="100" 
             value={activeLayer?.opacity ?? 100}
             onChange={(e) => updateActiveLayerOpacity(parseInt(e.target.value))}
+            onMouseUp={saveHistory}
+            onTouchEnd={saveHistory}
             className="h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-violet-500"
           />
         </div>
@@ -65,6 +68,7 @@ export default function SideBarLayer() {
           <Reorder.Item 
             key={layer.id} 
             value={layer}
+            onDragEnd={() => saveHistory()}
             className="relative"
           >
             <LayerCard
