@@ -66,13 +66,23 @@ export const useEditorStore = create<EditorState>((set, get) => {
     canvasBackground: state.canvasBackground,
   });
 
+  const MAX_HISTORY_SIZE = 30;
+
   const saveHistory = () => {
     const state = get();
     const nextHistory = state.history.slice(0, state.historyIndex + 1);
     const newSnapshot = createSnapshot(state);
-    const newIndex = nextHistory.length;
+    
+    let updatedHistory = [...nextHistory, newSnapshot];
+    let newIndex = updatedHistory.length - 1;
+
+    if (updatedHistory.length > MAX_HISTORY_SIZE) {
+      updatedHistory = updatedHistory.slice(updatedHistory.length - MAX_HISTORY_SIZE);
+      newIndex = MAX_HISTORY_SIZE - 1;
+    }
+
     set({
-      history: [...nextHistory, newSnapshot],
+      history: updatedHistory,
       historyIndex: newIndex,
     });
   };
